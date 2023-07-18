@@ -3,6 +3,7 @@ body {
   grid-template-rows: 3px 1fr 3px;
   place-items: stretch;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 .visualizer {
@@ -10,9 +11,23 @@ body {
 }
 
 .swiper {
-  display: grid;
+  width: 100%;
 }
 
-.swiper-slide {
+.group {
+  display: flex;
   width: min-content;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.info {
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
 }

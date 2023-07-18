@@ -1,5 +1,5 @@
 import '@unocss/reset/tailwind.css';
-import 'pdfjs-dist/web/pdf_viewer.css';
+// import 'pdfjs-dist/web/pdf_viewer.css';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/mousewheel';
@@ -43,26 +43,14 @@ const renderPage = async (
     viewport,
     transform,
   };
-  await page.render(renderContext).promise;
+  // Do not wait render
+  page.render(renderContext);
 
   return canvas;
 };
 
-const main = async () => {
-  const pdf = await pdfjs.getDocument(samplePDF).promise;
-  // TODO: lazy-load pages
-  const canvases = await Promise.all(
-    Array.from({ length: 7 }, (_, i) => renderPage(pdf, i + 1))
-  );
-
-  canvases.forEach((canvas) => {
-    const wrapper = document.createElement('div');
-    wrapper.classList.add('swiper-slide');
-    wrapper.appendChild(canvas);
-    container.appendChild(wrapper);
-  });
-  // const canvas = await renderPage(pdf, 1);
-  const _swiper = new Swiper('.swiper', {
+const setupSwiper = (): Swiper => {
+  const swiper = new Swiper('.swiper', {
     cssMode: true,
 
     direction: 'horizontal',
@@ -72,15 +60,68 @@ const main = async () => {
     spaceBetween: 0,
     centeredSlides: true,
 
+    observer: true,
+
     modules: [Pagination, Mousewheel, Keyboard],
 
     pagination: {
       el: '.swiper-pagination',
+      clickable: true,
     },
 
-    mousewheel: true,
-    keyboard: true, // TODO: not work
+    mousewheel: {
+      invert: true,
+    },
+    keyboard: true,
   });
+  return swiper;
+};
+
+const displayPDF = async (url: string) => {
+  const pdf = await pdfjs.getDocument(url).promise;
+  const canvases = await Promise.all(
+    Array.from({ length: pdf.numPages }, (_, i) => renderPage(pdf, i + 1))
+  );
+
+  const maxWidth = Math.floor(container.clientWidth * dpr);
+  console.log(container.clientWidth);
+  let groups = [];
+  let prevIndex = 0;
+  let currWidth = 0;
+  for (const [index, canvas] of canvases.entries()) {
+    currWidth += canvas.width;
+    if (currWidth > maxWidth) {
+      // prevIndex <= index - 1 unless index === 0
+      const group = canvases.slice(prevIndex, index);
+      if (group.length > 0) {
+        groups.push(group);
+      }
+      prevIndex = index;
+      currWidth = canvas.width;
+    }
+  }
+  // Push the rest
+  groups.push(canvases.slice(prevIndex));
+
+  container.replaceChildren();
+  for (const group of groups) {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('swiper-slide');
+    wrapper.classList.add('group');
+    for (const canvas of group) {
+      wrapper.appendChild(canvas);
+    }
+    container.appendChild(wrapper);
+  }
+};
+
+const main = async () => {
+  setupSwiper();
+  displayPDF(samplePDF);
 };
 
 main();
+
+// TODO: MIDI support
+// TODO: On window size change
+// TODO: Drag and drop
