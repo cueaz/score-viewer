@@ -7,3 +7,8 @@ body {
 .visualizer {
   background-color: #ff0000;
 }
+
+.swiper {
+  display: grid;
+  width: 100%;
+}
