@@ -18,6 +18,31 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
+const swiper = new Swiper('.swiper', {
+  cssMode: true,
+
+  direction: 'horizontal',
+  loop: false,
+
+  slidesPerView: 'auto',
+  spaceBetween: 0,
+  centeredSlides: true,
+  slideToClickedSlide: true,
+
+  observer: true,
+  observeParents: true,
+
+  modules: [Pagination, Mousewheel, Keyboard],
+
+  pagination: {
+    el: '.swiper-pagination',
+    clickable: true,
+  },
+
+  mousewheel: true,
+  keyboard: true,
+});
+
 const dpr = window.devicePixelRatio || 1;
 const container = document.querySelector('#container')!;
 
@@ -25,6 +50,7 @@ const renderPage = async (
   pdf: pdfjs.PDFDocumentProxy,
   pageNum: number
 ): Promise<HTMLCanvasElement> => {
+  console.log(pageNum);
   const page = await pdf.getPage(pageNum);
 
   const canvas = document.createElement('canvas');
@@ -52,46 +78,40 @@ const renderPage = async (
 
 // type SlideElement = HTMLElement & { progress: number };
 
-const setupSwiper = (): Swiper => {
-  const swiper = new Swiper('.swiper', {
-    cssMode: true,
-
-    direction: 'horizontal',
-    loop: false,
-
-    slidesPerView: 'auto',
-    spaceBetween: 0,
-    centeredSlides: true,
-    slideToClickedSlide: true,
-
-    observer: true,
-    observeParents: true,
-
-    modules: [Pagination, Mousewheel, Keyboard],
-
-    pagination: {
-      el: '.swiper-pagination',
-      clickable: true,
-    },
-
-    mousewheel: true,
-    keyboard: true,
-  });
-
-  return swiper;
-};
-
 // At most one PDF is displayed at a time, use a global variable for simplicity
 let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
+const sep = ',';
 
 const displayPDF = async () => {
   if (!currentPDF) {
     return;
   }
   const pdf = await pdfjs.getDocument(currentPDF).promise;
-  // TODO: Render visible page first
+
+  // Render visible page first (left, active, right)
+  const minIndex = Math.max(swiper.activeIndex - 1, 0);
+  const maxIndex = Math.min(swiper.activeIndex + 1, swiper.slides.length - 1);
+  let prerendered = new Map();
+  for (let i = minIndex; i <= maxIndex; i++) {
+    const slide = swiper.slides[i];
+    // TODO: On first load, slide is undefined, no prerender
+    if (!slide) {
+      continue;
+    }
+    if (slide.dataset.pages) {
+      for (const pageNumString of slide.dataset.pages.split(sep)) {
+        const pageNum = parseInt(pageNumString);
+        if (isNaN(pageNum)) {
+          continue;
+        }
+        prerendered.set(pageNum, renderPage(pdf, pageNum));
+      }
+    }
+  }
   const canvases = await Promise.all(
-    Array.from({ length: pdf.numPages }, (_, i) => renderPage(pdf, i + 1))
+    [...Array(pdf.numPages).keys()].map((i) =>
+      prerendered.has(i + 1) ? prerendered.get(i + 1) : renderPage(pdf, i + 1)
+    )
   );
 
   console.log(container.clientWidth, container.clientHeight);
@@ -104,21 +124,28 @@ const displayPDF = async () => {
     if (currWidth > maxWidth) {
       // prevIndex <= index - 1 unless index === 0
       const group = canvases.slice(prevIndex, index);
+      const pageNums = [...group.keys()].map((i) => i + prevIndex + 1);
       if (group.length > 0) {
-        groups.push(group);
+        groups.push([group, pageNums]);
       }
       prevIndex = index;
       currWidth = canvas.width;
     }
   }
   // Push the rest
-  groups.push(canvases.slice(prevIndex));
+  groups.push([
+    canvases.slice(prevIndex),
+    [...Array(canvases.length - prevIndex).keys()].map(
+      (i) => i + prevIndex + 1
+    ),
+  ]);
 
   container.replaceChildren();
-  for (const group of groups) {
+  for (const [group, pageNums] of groups) {
     const wrapper = document.createElement('div');
     wrapper.classList.add('swiper-slide');
     wrapper.classList.add('group');
+    wrapper.dataset.pages = pageNums.join(sep);
     for (const canvas of group) {
       wrapper.appendChild(canvas);
     }
@@ -127,11 +154,23 @@ const displayPDF = async () => {
 };
 
 const main = async () => {
-  setupSwiper();
   currentPDF = samplePDF;
-  const func = debounce(50, displayPDF);
-  func();
-  new ResizeObserver(func).observe(container);
+  displayPDF();
+  new ResizeObserver(
+    debounce(
+      100,
+      (() => {
+        let flag = false;
+        return () => {
+          if (!flag) {
+            flag = true;
+            return;
+          }
+          displayPDF();
+        };
+      })()
+    )
+  ).observe(container);
   // TODO: container.clientHeight does not change
 };
 
