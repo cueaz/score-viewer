@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { pdfjs, Document, Page } from 'react-pdf';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -45,9 +46,24 @@ const Viewer = () => {
         </div>
         <div className="Example__container__document">
           <Document file={file} onLoadSuccess={onDocumentLoadSuccess}>
-            {Array.from(new Array(numPages), (_el, index) => (
-              <Page key={`page_${index + 1}`} pageNumber={index + 1} />
-            ))}
+            <Swiper
+              spaceBetween={50}
+              slidesPerView={3}
+              onSlideChange={() => console.log('slide change')}
+              onSwiper={(swiper) => console.log(swiper)}
+            >
+              {Array.from(new Array(numPages), (_el, index) => (
+                <SwiperSlide key={`slide_${index + 1}`}>
+                  <div>
+                    <Page
+                      key={`page_${index + 1}`}
+                      style={{ display: 'block' }}
+                      pageNumber={index + 1}
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </Document>
         </div>
       </div>
