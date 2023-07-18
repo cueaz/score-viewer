@@ -9,6 +9,7 @@ import './index.css';
 import * as pdfjs from 'pdfjs-dist';
 import Swiper from 'swiper';
 import { Pagination, Mousewheel, Keyboard } from 'swiper/modules';
+import { debounce } from 'throttle-debounce';
 
 import samplePDF from './sample.pdf';
 
@@ -64,6 +65,7 @@ const setupSwiper = (): Swiper => {
     slideToClickedSlide: true,
 
     observer: true,
+    observeParents: true,
 
     modules: [Pagination, Mousewheel, Keyboard],
 
@@ -72,41 +74,27 @@ const setupSwiper = (): Swiper => {
       clickable: true,
     },
 
-    mousewheel: {
-      invert: true,
-    },
+    mousewheel: true,
     keyboard: true,
-
-    // watchSlidesProgress: true,
-    // on: {
-    //   setTranslate() {
-    //     const slides = swiper.slides as SlideElement[];
-    //     const maxWidth = Math.max(...slides.map((slide) => slide.clientWidth));
-    //     for (const slide of slides) {
-    //       console.log(slide.progress);
-    //       const ratio = slide.clientWidth / maxWidth;
-    //       const progress = slide.progress * ratio;
-    //       // slide.style.opacity = 1 + Math.min(Math.max(slide.progress, -1), 0);
-    //       slide.style.opacity = `${Math.max(1 - Math.abs(progress), 0)}`;
-    //     }
-    //   },
-    //   setTransition(duration) {
-    //     for (const slide of swiper.slides) {
-    //       slide.style.transitionDuration = `${duration}ms`;
-    //     }
-    //   },
-    // },
   });
 
   return swiper;
 };
 
-const displayPDF = async (url: string) => {
-  const pdf = await pdfjs.getDocument(url).promise;
+// At most one PDF is displayed at a time, use a global variable for simplicity
+let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
+
+const displayPDF = async () => {
+  if (!currentPDF) {
+    return;
+  }
+  const pdf = await pdfjs.getDocument(currentPDF).promise;
+  // TODO: Render visible page first
   const canvases = await Promise.all(
     Array.from({ length: pdf.numPages }, (_, i) => renderPage(pdf, i + 1))
   );
 
+  console.log(container.clientWidth, container.clientHeight);
   const maxWidth = Math.floor(container.clientWidth * dpr);
   let groups = [];
   let prevIndex = 0;
@@ -140,7 +128,11 @@ const displayPDF = async (url: string) => {
 
 const main = async () => {
   setupSwiper();
-  displayPDF(samplePDF);
+  currentPDF = samplePDF;
+  const func = debounce(50, displayPDF);
+  func();
+  new ResizeObserver(func).observe(container);
+  // TODO: container.clientHeight does not change
 };
 
 main();
