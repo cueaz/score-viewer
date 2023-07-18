@@ -1,6 +1,7 @@
 body {
   display: grid;
   grid-template-rows: 3px 1fr 3px;
+  place-items: stretch;
   min-height: 100vh;
 }
 
@@ -10,5 +11,4 @@ body {
 
 .swiper {
   display: grid;
-  width: 100%;
 }

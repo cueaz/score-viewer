@@ -1,10 +1,14 @@
 import '@unocss/reset/tailwind.css';
 import 'pdfjs-dist/web/pdf_viewer.css';
 import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/mousewheel';
+import 'swiper/css/keyboard';
 import './index.css';
 
 import * as pdfjs from 'pdfjs-dist';
 import Swiper from 'swiper';
+import { Pagination, Mousewheel, Keyboard } from 'swiper/modules';
 
 import samplePDF from './sample.pdf';
 
@@ -25,7 +29,6 @@ const renderPage = async (
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d')!;
 
-  console.log(container.clientHeight, container.clientWidth);
   const viewport = page.getViewport({
     scale: container.clientHeight / page.getViewport({ scale: 1 }).height,
   });
@@ -49,8 +52,9 @@ const main = async () => {
   const pdf = await pdfjs.getDocument(samplePDF).promise;
   // TODO: lazy-load pages
   const canvases = await Promise.all(
-    Array.from({ length: 3 }, (_, i) => renderPage(pdf, i + 1))
+    Array.from({ length: 7 }, (_, i) => renderPage(pdf, i + 1))
   );
+
   canvases.forEach((canvas) => {
     const wrapper = document.createElement('div');
     wrapper.classList.add('swiper-slide');
@@ -58,10 +62,22 @@ const main = async () => {
     container.appendChild(wrapper);
   });
   // const canvas = await renderPage(pdf, 1);
-
   const _swiper = new Swiper('.swiper', {
+    cssMode: true,
+
     direction: 'horizontal',
     loop: false,
+
+    slidesPerView: 3,
+
+    modules: [Pagination, Mousewheel, Keyboard],
+
+    pagination: {
+      el: '.swiper-pagination',
+    },
+
+    mousewheel: true,
+    keyboard: true, // TODO: not work
   });
 };
 
