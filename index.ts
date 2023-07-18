@@ -49,6 +49,8 @@ const renderPage = async (
   return canvas;
 };
 
+// type SlideElement = HTMLElement & { progress: number };
+
 const setupSwiper = (): Swiper => {
   const swiper = new Swiper('.swiper', {
     cssMode: true,
@@ -59,6 +61,7 @@ const setupSwiper = (): Swiper => {
     slidesPerView: 'auto',
     spaceBetween: 0,
     centeredSlides: true,
+    slideToClickedSlide: true,
 
     observer: true,
 
@@ -73,7 +76,28 @@ const setupSwiper = (): Swiper => {
       invert: true,
     },
     keyboard: true,
+
+    // watchSlidesProgress: true,
+    // on: {
+    //   setTranslate() {
+    //     const slides = swiper.slides as SlideElement[];
+    //     const maxWidth = Math.max(...slides.map((slide) => slide.clientWidth));
+    //     for (const slide of slides) {
+    //       console.log(slide.progress);
+    //       const ratio = slide.clientWidth / maxWidth;
+    //       const progress = slide.progress * ratio;
+    //       // slide.style.opacity = 1 + Math.min(Math.max(slide.progress, -1), 0);
+    //       slide.style.opacity = `${Math.max(1 - Math.abs(progress), 0)}`;
+    //     }
+    //   },
+    //   setTransition(duration) {
+    //     for (const slide of swiper.slides) {
+    //       slide.style.transitionDuration = `${duration}ms`;
+    //     }
+    //   },
+    // },
   });
+
   return swiper;
 };
 
@@ -84,7 +108,6 @@ const displayPDF = async (url: string) => {
   );
 
   const maxWidth = Math.floor(container.clientWidth * dpr);
-  console.log(container.clientWidth);
   let groups = [];
   let prevIndex = 0;
   let currWidth = 0;
@@ -122,6 +145,9 @@ const main = async () => {
 
 main();
 
+// TODO: pdf.js: cmap, font, text/annotation layer
+// TODO: Loading indicator
+// TODO: Navigation
 // TODO: MIDI support
 // TODO: On window size change
 // TODO: Drag and drop
