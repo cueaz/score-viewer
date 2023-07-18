@@ -1,0 +1,9 @@
+body {
+  display: grid;
+  grid-template-rows: 3px 1fr 3px;
+  min-height: 100vh;
+}
+
+.visualizer {
+  background-color: #ff0000;
+}
