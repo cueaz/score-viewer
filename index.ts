@@ -68,7 +68,9 @@ const main = async () => {
     direction: 'horizontal',
     loop: false,
 
-    slidesPerView: 3,
+    slidesPerView: 'auto',
+    spaceBetween: 0,
+    centeredSlides: true,
 
     modules: [Pagination, Mousewheel, Keyboard],
 

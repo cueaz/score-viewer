@@ -12,3 +12,7 @@ body {
 .swiper {
   display: grid;
 }
+
+.swiper-slide {
+  width: min-content;
+}
