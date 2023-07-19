@@ -24,7 +24,7 @@ body {
   opacity: 0.3;
 }
 
-.banner {
+#welcome {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,4 +35,8 @@ body {
   font-size: 2rem;
   font-weight: bold;
   text-transform: uppercase;
+}
+
+#input {
+  display: none;
 }

@@ -80,6 +80,7 @@ const renderPage = async (
 let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
 const mutateCurrentPDF = <T>(func: () => T): T => {
   const res = func();
+  swiper.activeIndex = 0;
   displayPDF();
   return res;
 };
@@ -255,9 +256,16 @@ const setupMIDI = async (): Promise<void> => {
     }
     return;
   }
-
   setupMIDIDevices(midi);
-  midi.onstatechange = (event) => setupMIDIDevices(event.target as MIDIAccess);
+  midi.onstatechange = () => midi && setupMIDIDevices(midi);
+};
+
+const readFileToPDF = (file: File): void => {
+  const reader = new FileReader();
+  reader.onload = () => {
+    mutateCurrentPDF(() => (currentPDF = reader.result));
+  };
+  reader.readAsArrayBuffer(file);
 };
 
 const setupDragAndDrop = (): void => {
@@ -269,18 +277,14 @@ const setupDragAndDrop = (): void => {
       return;
     }
 
-    const files = [...transfer.items].filter((item) => item.kind === 'file');
+    const files = [...transfer.items]
+      .filter((item) => item.kind === 'file')
+      .map((item) => item.getAsFile()!) // Not null if kind is file
+      .filter((file) => file.type === 'application/pdf');
     if (files.length === 0) {
       return;
     }
-    // Not null because item.kind === 'file'
-    const file = files[0].getAsFile()!;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      mutateCurrentPDF(() => (currentPDF = reader.result));
-    };
-    reader.readAsArrayBuffer(file);
+    readFileToPDF(files[0]);
   };
 
   container.ondragover = (event: Event) => {
@@ -288,8 +292,22 @@ const setupDragAndDrop = (): void => {
   };
 };
 
+const setupFileInput = (): void => {
+  const welcome = document.querySelector<HTMLElement>('#welcome')!;
+  const input = document.querySelector<HTMLInputElement>('#input')!;
+
+  welcome.onclick = () => input.click();
+  input.onchange = () => {
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+    readFileToPDF(input.files[0]);
+  };
+};
+
 const main = async (): Promise<void> => {
   setupDragAndDrop();
+  setupFileInput();
   // mutateCurrentPDF(() => (currentPDF = samplePDF));
   new ResizeObserver(
     debounce(
@@ -313,4 +331,6 @@ const main = async (): Promise<void> => {
 main();
 
 // TODO: pdf.js: cmap, font, text/annotation layer
-//
+// TODO: Loading indicator?
+// TODO: Glow Effect?
+// TODO: Minify HTML
