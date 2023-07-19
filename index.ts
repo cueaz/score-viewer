@@ -298,6 +298,6 @@ main();
 // TODO: pdf.js: cmap, font, text/annotation layer
 // TODO: Loading indicator
 // TODO: Navigation
-// TODO: MIDI support
+// TODO: Glow Effect?
 // TODO: On window size change
 // TODO: Drag and drop

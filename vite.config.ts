@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   build: {
@@ -8,6 +9,11 @@ export default defineConfig({
         chunkFileNames: '_/[hash:8].js',
         assetFileNames: '_/[hash:8].[ext]',
       },
+    },
+  },
+  css: {
+    postcss: {
+      plugins: [autoprefixer()],
     },
   },
   server: {
