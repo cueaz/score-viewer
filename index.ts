@@ -18,7 +18,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-const swiper = new Swiper('.swiper', {
+const swiper = new Swiper('.swiper222', {
   cssMode: true,
 
   direction: 'horizontal',
@@ -31,6 +31,7 @@ const swiper = new Swiper('.swiper', {
 
   observer: true,
   observeParents: true,
+  observeSlideChildren: true,
 
   modules: [Pagination, Mousewheel, Keyboard],
 
@@ -80,6 +81,7 @@ const renderPage = async (
 let currentPDF: pdfjs.PDFDocumentProxy | null = null;
 const mutateCurrentPDF = async <T>(func: () => Promise<T>): Promise<T> => {
   const res = await func();
+  // Resize -> group changed -> activeIndex should be changed
   swiper.activeIndex = 0; // TODO: On resize, should activeIndex be preserved?
   displayPDF(); // Do not await
   return res;
@@ -311,21 +313,29 @@ const setupFileInput = (): void => {
 const main = async (): Promise<void> => {
   setupDragAndDrop();
   setupFileInput();
+  swiper.disable();
   // mutateCurrentPDF(() => (currentPDF = samplePDF));
+  // new ResizeObserver(
+  //   debounce(
+  //     100,
+  //     (() => {
+  //       let flag = false;
+  //       return () => {
+  //         if (!flag) {
+  //           flag = true;
+  //           return;
+  //         }
+  //         swiper.disable();
+  //         displayPDF();
+  //         swiper.enable();
+  //       };
+  //     })()
+  //   )
+  // ).observe(container);
   new ResizeObserver(
-    debounce(
-      100,
-      (() => {
-        let flag = false;
-        return () => {
-          if (!flag) {
-            flag = true;
-            return;
-          }
-          displayPDF();
-        };
-      })()
-    )
+    debounce(100, () => {
+      displayPDF();
+    })
   ).observe(container);
   // TODO: container.clientHeight does not change
   setupMIDI();

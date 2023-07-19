@@ -13,11 +13,19 @@ body {
 
 .swiper {
   width: 100%;
+  min-height: 0;
+  /* box-sizing: border-box; */
+}
+
+#container {
+  overflow: crop;
+  min-height: 0;
 }
 
 .group {
   display: flex;
   width: min-content;
+  min-height: 0;
 }
 
 .group:not(.swiper-slide-active) {
