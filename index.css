@@ -1,12 +1,12 @@
 body {
-  display: grid;
-  grid-template-rows: 10px minmax(0, 1fr) 10px;
-  /* place-items: stretch; */
-  min-height: 100vh;
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100vh;
   overflow: hidden;
 }
 
 .visualizer {
+  flex: 0 0 10px;
   --inactive: #aeaeae;
   background: var(--inactive);
   position: relative;
@@ -40,6 +40,8 @@ body {
 }
 
 .swiper {
+  flex: 1 1 auto;
+  overflow: hidden; /* key property to fit canvas size to parent when shrinking page */
   width: 100%;
   z-index: 0;
 }
@@ -51,15 +53,6 @@ body {
 
 .group:not(.swiper-slide-active) {
   opacity: 0.3;
-}
-
-.canvas-wrapper {
-  position: relative;
-}
-
-.canvas-wrapper > canvas {
-  position: absolute;
-  height: 100%;
 }
 
 #welcome {

@@ -28,7 +28,6 @@ const swiper = new Swiper('.swiper', {
 
   // observer: true,
   // observeParents: true,
-  // observeSlideChildren: true,
 
   modules: [Pagination, Mousewheel, Keyboard],
 
@@ -60,8 +59,6 @@ const renderPage = async (
   });
   canvas.width = Math.floor(viewport.width * dpr);
   canvas.height = Math.floor(viewport.height * dpr);
-  // canvas.style.width = Math.floor(viewport.width) + 'px';
-  // canvas.style.height = Math.floor(viewport.height) + 'px';
 
   const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined;
   const renderContext = {
@@ -110,7 +107,6 @@ const displayPDF = async (
 
   const containerWidth = containerRect?.width || container.clientWidth;
   const containerHeight = containerRect?.height || container.clientHeight;
-  // console.log(containerWidth, containerHeight);
 
   let groups = [];
   let prevIndex = 0;
@@ -128,6 +124,9 @@ const displayPDF = async (
       prevIndex = index;
       currWidth = width;
     }
+    // Update canvas rect
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${containerHeight}px`;
   }
   // Push the rest
   groups.push(canvases.slice(prevIndex));
@@ -146,21 +145,7 @@ const displayPDF = async (
       const wrapper = document.createElement('div');
       wrapper.classList.add('swiper-slide');
       wrapper.classList.add('group');
-      for (const canvas of group) {
-        const canvasWrapper = document.createElement('div');
-        // Autoscaling canvas requires absolute + height 100%
-        // canvaswrapper requires relative + manual width set to canvas width
-        canvasWrapper.classList.add('canvas-wrapper');
-        canvasWrapper.appendChild(canvas);
-        wrapper.appendChild(canvasWrapper);
-        new ResizeObserver((entries) => {
-          for (const entry of entries) {
-            canvasWrapper.style.width = `${entry.contentRect.width}px`;
-          }
-          // Required for initial render
-          swiper.update();
-        }).observe(canvas);
-      }
+      wrapper.append(...group);
       children.push(wrapper);
     }
     container.replaceChildren(...children);
@@ -344,6 +329,5 @@ main();
 // TODO: Minify HTML
 // TODO: Track visible page number when group changes
 // TODO: Logo
-// TODO: Initial Index, Chrome Width/Height
-// @ts-ignore
-// window.swiper = swiper;
+
+
