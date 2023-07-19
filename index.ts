@@ -18,7 +18,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-const swiper = new Swiper('.swiper222', {
+const swiper = new Swiper('.swiper', {
   cssMode: true,
 
   direction: 'horizontal',
@@ -62,8 +62,8 @@ const renderPage = async (
   });
   canvas.width = Math.floor(viewport.width * dpr);
   canvas.height = Math.floor(viewport.height * dpr);
-  canvas.style.width = Math.floor(viewport.width) + 'px';
-  canvas.style.height = Math.floor(viewport.height) + 'px';
+  // canvas.style.width = Math.floor(viewport.width) + 'px';
+  // canvas.style.height = Math.floor(viewport.height) + 'px';
 
   const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined;
   const renderContext = {
@@ -153,7 +153,17 @@ const displayPDF = async (): Promise<void> => {
     wrapper.classList.add('group');
     wrapper.dataset.pages = pageNums.join(sep);
     for (const canvas of group) {
-      wrapper.appendChild(canvas);
+      const canvasWrapper = document.createElement('div');
+      // Autoscaling canvas requires absolute + height 100%
+      // canvaswrapper requires relative + width set to canvas width
+      canvasWrapper.classList.add('canvas-wrapper');
+      canvasWrapper.appendChild(canvas);
+      wrapper.appendChild(canvasWrapper);
+      new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          canvasWrapper.style.width = `${entry.contentRect.width}px`;
+        }
+      }).observe(canvas);
     }
     container.appendChild(wrapper);
   }
@@ -273,6 +283,19 @@ const readFileToPDF = (file: File): void => {
   reader.readAsArrayBuffer(file);
 };
 
+const setupFileInput = (): void => {
+  const welcome = document.querySelector<HTMLElement>('#welcome')!;
+  const input = document.querySelector<HTMLInputElement>('#input')!;
+
+  welcome.onclick = () => input.click();
+  input.onchange = () => {
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+    readFileToPDF(input.files[0]);
+  };
+};
+
 const setupDragAndDrop = (): void => {
   container.ondrop = (event: Event) => {
     event.preventDefault();
@@ -297,23 +320,9 @@ const setupDragAndDrop = (): void => {
   };
 };
 
-const setupFileInput = (): void => {
-  const welcome = document.querySelector<HTMLElement>('#welcome')!;
-  const input = document.querySelector<HTMLInputElement>('#input')!;
-
-  welcome.onclick = () => input.click();
-  input.onchange = () => {
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-    readFileToPDF(input.files[0]);
-  };
-};
-
 const main = async (): Promise<void> => {
   setupDragAndDrop();
   setupFileInput();
-  swiper.disable();
   // mutateCurrentPDF(() => (currentPDF = samplePDF));
   // new ResizeObserver(
   //   debounce(

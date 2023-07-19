@@ -13,19 +13,24 @@ body {
 
 .swiper {
   width: 100%;
-  min-height: 0;
-  /* box-sizing: border-box; */
 }
 
-#container {
-  overflow: crop;
-  min-height: 0;
+.swiper-wrapper {
+  position: relative;
 }
 
 .group {
   display: flex;
   width: min-content;
-  min-height: 0;
+}
+
+.canvas-wrapper {
+  position: relative;
+}
+
+.canvas-wrapper > canvas {
+  position: absolute;
+  height: 100%;
 }
 
 .group:not(.swiper-slide-active) {
