@@ -51,7 +51,6 @@ const renderPage = async (
   pdf: pdfjs.PDFDocumentProxy,
   pageNum: number
 ): Promise<HTMLCanvasElement> => {
-  console.log(pageNum);
   const page = await pdf.getPage(pageNum);
 
   const canvas = document.createElement('canvas');
@@ -261,7 +260,9 @@ const setupMIDI = async (): Promise<void> => {
   try {
     midi = await navigator.requestMIDIAccess();
   } catch (e) {
-    console.log(e);
+    if (e instanceof Error) {
+      console.log(e.message);
+    }
     return;
   }
 
@@ -301,3 +302,4 @@ main();
 // TODO: Glow Effect?
 // TODO: On window size change
 // TODO: Drag and drop
+// TODO: Minify HTML
