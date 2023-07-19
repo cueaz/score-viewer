@@ -1,7 +1,7 @@
 body {
   display: grid;
   grid-template-rows: 10px minmax(0, 1fr) 10px;
-  place-items: stretch;
+  /* place-items: stretch; */
   min-height: 100vh;
   overflow: hidden;
 }

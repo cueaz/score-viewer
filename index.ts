@@ -110,6 +110,7 @@ const displayPDF = async (
 
   const containerWidth = containerRect?.width || container.clientWidth;
   const containerHeight = containerRect?.height || container.clientHeight;
+  // console.log(containerWidth, containerHeight);
 
   let groups = [];
   let prevIndex = 0;
@@ -156,6 +157,8 @@ const displayPDF = async (
           for (const entry of entries) {
             canvasWrapper.style.width = `${entry.contentRect.width}px`;
           }
+          // Required for initial render
+          swiper.update();
         }).observe(canvas);
       }
       children.push(wrapper);
@@ -244,7 +247,7 @@ const visualizeMIDI = (): void => {
   }
 
   const colors = [...notesOn.keys()]
-    .sort()
+    .sort((a, b) => a - b)
     .map((note) => noteColors[note % noteColors.length]);
   const ratios = [...colors.keys(), colors.length].map(
     (i) => `${(i / colors.length) * 100}%`
@@ -338,6 +341,9 @@ main();
 
 // TODO: pdf.js: cmap, font, text/annotation layer
 // TODO: Loading indicator?
-// TODO: Glow Effect?
 // TODO: Minify HTML
 // TODO: Track visible page number when group changes
+// TODO: Logo
+// TODO: Initial Index, Chrome Width/Height
+// @ts-ignore
+// window.swiper = swiper;
