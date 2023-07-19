@@ -109,11 +109,6 @@ const displayPDF = async (
 
   const containerWidth = containerRect?.width || container.clientWidth;
   const containerHeight = containerRect?.height || container.clientHeight;
-  console.log(
-    container.clientWidth,
-    container.clientHeight,
-    window.screen.width
-  );
 
   let groups = [];
   let prevIndex = 0;
@@ -135,7 +130,15 @@ const displayPDF = async (
   // Push the rest
   groups.push(canvases.slice(prevIndex));
 
-  if (reload || container.children.length !== groups.length) {
+  const nestedLengthEqual =
+    container.children.length === groups.length &&
+    groups.every(
+      (group, i) =>
+        container.children[i] instanceof HTMLElement &&
+        group.length === container.children[i].children.length
+    );
+
+  if (reload || !nestedLengthEqual) {
     let children = [];
     for (const group of groups) {
       const wrapper = document.createElement('div');
@@ -330,3 +333,4 @@ main();
 // TODO: Loading indicator?
 // TODO: Glow Effect?
 // TODO: Minify HTML
+// TODO: Track visible page number when group changes
