@@ -9,9 +9,6 @@ import './index.css';
 import * as pdfjs from 'pdfjs-dist';
 import Swiper from 'swiper';
 import { Pagination, Mousewheel, Keyboard } from 'swiper/modules';
-import { debounce } from 'throttle-debounce';
-
-// import samplePDF from './sample.pdf';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -29,9 +26,9 @@ const swiper = new Swiper('.swiper', {
   centeredSlides: true,
   slideToClickedSlide: true,
 
-  observer: true,
-  observeParents: true,
-  observeSlideChildren: true,
+  // observer: true,
+  // observeParents: true,
+  // observeSlideChildren: true,
 
   modules: [Pagination, Mousewheel, Keyboard],
 
@@ -58,7 +55,7 @@ const renderPage = async (
   const context = canvas.getContext('2d')!;
 
   const viewport = page.getViewport({
-    scale: container.clientHeight / page.getViewport({ scale: 1 }).height,
+    scale: window.screen.height / page.getViewport({ scale: 1 }).height,
   });
   canvas.width = Math.floor(viewport.width * dpr);
   canvas.height = Math.floor(viewport.height * dpr);
@@ -77,97 +74,92 @@ const renderPage = async (
   return canvas;
 };
 
-// let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
 let currentPDF: pdfjs.PDFDocumentProxy | null = null;
 const mutateCurrentPDF = async <T>(func: () => Promise<T>): Promise<T> => {
   const res = await func();
-  // Resize -> group changed -> activeIndex should be changed
-  swiper.activeIndex = 0; // TODO: On resize, should activeIndex be preserved?
-  displayPDF(); // Do not await
+  displayPDF(true); // Do not await
   return res;
 };
 
-const displayPDF = async (): Promise<void> => {
+let cachedCanvases: HTMLCanvasElement[] | null = null;
+const displayPDF = async (
+  reload: boolean,
+  containerRect?: DOMRectReadOnly
+): Promise<void> => {
   if (!currentPDF) {
     return;
   }
   const pdf = currentPDF;
 
-  const sep = ',';
-  // Render visible page first (left, active, right)
-  const minIndex = Math.max(swiper.activeIndex - 1, 0);
-  const maxIndex = Math.min(swiper.activeIndex + 1, swiper.slides.length - 1);
-  let prerendered = new Map();
-  for (let i = minIndex; i <= maxIndex; i++) {
-    const slide = swiper.slides[i];
-    // TODO: On first load, slide is undefined, no prerender
-    if (!slide) {
-      continue;
-    }
-    if (slide.dataset.pages) {
-      for (const pageNumString of slide.dataset.pages.split(sep)) {
-        const pageNum = parseInt(pageNumString);
-        if (isNaN(pageNum)) {
-          continue;
-        }
-        prerendered.set(pageNum, renderPage(pdf, pageNum));
-      }
-    }
-  }
-  const canvases = await Promise.all(
-    [...Array(pdf.numPages).keys()].map((i) =>
-      prerendered.has(i + 1) ? prerendered.get(i + 1) : renderPage(pdf, i + 1)
+  let canvases;
+  if (!reload && cachedCanvases) {
+    canvases = cachedCanvases;
+  } else {
+    canvases = (
+      await Promise.allSettled(
+        [...Array(pdf.numPages).keys()].map((i) => renderPage(pdf, i + 1))
+      )
     )
+      .filter((result) => result.status === 'fulfilled')
+      .map(
+        (result) => (result as PromiseFulfilledResult<HTMLCanvasElement>).value
+      );
+    cachedCanvases = canvases;
+  }
+
+  const containerWidth = containerRect?.width || container.clientWidth;
+  const containerHeight = containerRect?.height || container.clientHeight;
+  console.log(
+    container.clientWidth,
+    container.clientHeight,
+    window.screen.width
   );
 
-  console.log(container.clientWidth, container.clientHeight);
-  const maxWidth = Math.floor(container.clientWidth * dpr);
   let groups = [];
   let prevIndex = 0;
   let currWidth = 0;
   for (const [index, canvas] of canvases.entries()) {
-    currWidth += canvas.width;
-    if (currWidth > maxWidth) {
+    // canvas aspect ratio * container.height = width
+    const width = (canvas.width / canvas.height) * containerHeight;
+    currWidth += width;
+    if (currWidth > containerWidth) {
       // prevIndex <= index - 1 unless index === 0
       const group = canvases.slice(prevIndex, index);
-      const pageNums = [...group.keys()].map((i) => i + prevIndex + 1);
       if (group.length > 0) {
-        groups.push([group, pageNums]);
+        groups.push(group);
       }
       prevIndex = index;
-      currWidth = canvas.width;
+      currWidth = width;
     }
   }
   // Push the rest
-  groups.push([
-    canvases.slice(prevIndex),
-    [...Array(canvases.length - prevIndex).keys()].map(
-      (i) => i + prevIndex + 1
-    ),
-  ]);
+  groups.push(canvases.slice(prevIndex));
 
-  let children = [];
-  for (const [group, pageNums] of groups) {
-    const wrapper = document.createElement('div');
-    wrapper.classList.add('swiper-slide');
-    wrapper.classList.add('group');
-    wrapper.dataset.pages = pageNums.join(sep);
-    for (const canvas of group) {
-      const canvasWrapper = document.createElement('div');
-      // Autoscaling canvas requires absolute + height 100%
-      // canvaswrapper requires relative + width set to canvas width
-      canvasWrapper.classList.add('canvas-wrapper');
-      canvasWrapper.appendChild(canvas);
-      wrapper.appendChild(canvasWrapper);
-      new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          canvasWrapper.style.width = `${entry.contentRect.width}px`;
-        }
-      }).observe(canvas);
+  if (reload || container.children.length !== groups.length) {
+    let children = [];
+    for (const group of groups) {
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('swiper-slide');
+      wrapper.classList.add('group');
+      for (const canvas of group) {
+        const canvasWrapper = document.createElement('div');
+        // Autoscaling canvas requires absolute + height 100%
+        // canvaswrapper requires relative + manual width set to canvas width
+        canvasWrapper.classList.add('canvas-wrapper');
+        canvasWrapper.appendChild(canvas);
+        wrapper.appendChild(canvasWrapper);
+        new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            canvasWrapper.style.width = `${entry.contentRect.width}px`;
+          }
+        }).observe(canvas);
+      }
+      children.push(wrapper);
     }
-    children.push(wrapper);
+    container.replaceChildren(...children);
   }
-  container.replaceChildren(...children);
+
+  swiper.update();
 };
 
 // https://webmidi-examples.glitch.me
@@ -324,31 +316,12 @@ const setupDragAndDrop = (): void => {
 const main = async (): Promise<void> => {
   setupDragAndDrop();
   setupFileInput();
-  // mutateCurrentPDF(() => (currentPDF = samplePDF));
-  // new ResizeObserver(
-  //   debounce(
-  //     100,
-  //     (() => {
-  //       let flag = false;
-  //       return () => {
-  //         if (!flag) {
-  //           flag = true;
-  //           return;
-  //         }
-  //         swiper.disable();
-  //         displayPDF();
-  //         swiper.enable();
-  //       };
-  //     })()
-  //   )
-  // ).observe(container);
-  new ResizeObserver(
-    debounce(100, () => {
-      displayPDF();
-    })
-  ).observe(container);
-  // TODO: container.clientHeight does not change
   setupMIDI();
+  new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      displayPDF(false, entry.contentRect);
+    }
+  }).observe(container);
 };
 
 main();

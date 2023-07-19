@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@types/throttle-debounce':
-    specifier: ^5.0.0
-    version: 5.0.0
   '@unocss/reset':
     specifier: ^0.53.5
     version: 0.53.5
@@ -17,9 +14,6 @@ dependencies:
   swiper:
     specifier: ^10.0.4
     version: 10.0.4
-  throttle-debounce:
-    specifier: ^5.0.0
-    version: 5.0.0
 
 devDependencies:
   autoprefixer:
@@ -256,10 +250,6 @@ packages:
       - supports-color
     dev: false
     optional: true
-
-  /@types/throttle-debounce@5.0.0:
-    resolution: {integrity: sha512-Pb7k35iCGFcGPECoNE4DYp3Oyf2xcTd3FbFQxXUI9hEYKUl6YX+KLf7HrBmgVcD05nl50LIH6i+80js4iYmWbw==}
-    dev: false
 
   /@unocss/reset@0.53.5:
     resolution: {integrity: sha512-tH8K4jw76mbWA67UUHKV6zxiwOsiG+byrHoG3lz8hr+cm6OgEJ3WjNNp7dZINmr7S7ylWO6igbxGQpsAuIQZCw==}
@@ -837,11 +827,6 @@ packages:
       yallist: 4.0.0
     dev: false
     optional: true
-
-  /throttle-debounce@5.0.0:
-    resolution: {integrity: sha512-2iQTSgkkc1Zyk0MeVrt/3BvuOXYPl/R8Z0U2xxo9rjwNciaHDG3R+Lm6dh4EeUci49DanvBnuqI6jshoQQRGEg==}
-    engines: {node: '>=12.22'}
-    dev: false
 
   /tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
