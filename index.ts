@@ -76,12 +76,12 @@ const renderPage = async (
   return canvas;
 };
 
-// At most one PDF is displayed at a time, use a global variable for simplicity
-let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
-const mutateCurrentPDF = <T>(func: () => T): T => {
-  const res = func();
-  swiper.activeIndex = 0;
-  displayPDF();
+// let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
+let currentPDF: pdfjs.PDFDocumentProxy | null = null;
+const mutateCurrentPDF = async <T>(func: () => Promise<T>): Promise<T> => {
+  const res = await func();
+  swiper.activeIndex = 0; // TODO: On resize, should activeIndex be preserved?
+  displayPDF(); // Do not await
   return res;
 };
 
@@ -89,7 +89,7 @@ const displayPDF = async (): Promise<void> => {
   if (!currentPDF) {
     return;
   }
-  const pdf = await pdfjs.getDocument(currentPDF).promise;
+  const pdf = currentPDF;
 
   const sep = ',';
   // Render visible page first (left, active, right)
@@ -263,7 +263,10 @@ const setupMIDI = async (): Promise<void> => {
 const readFileToPDF = (file: File): void => {
   const reader = new FileReader();
   reader.onload = () => {
-    mutateCurrentPDF(() => (currentPDF = reader.result));
+    const result = reader.result as ArrayBuffer;
+    mutateCurrentPDF(async () => {
+      currentPDF = await pdfjs.getDocument(result).promise;
+    });
   };
   reader.readAsArrayBuffer(file);
 };
