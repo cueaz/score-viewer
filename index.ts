@@ -11,7 +11,7 @@ import Swiper from 'swiper';
 import { Pagination, Mousewheel, Keyboard } from 'swiper/modules';
 import { debounce } from 'throttle-debounce';
 
-import samplePDF from './sample.pdf';
+// import samplePDF from './sample.pdf';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -257,13 +257,40 @@ const setupMIDI = async (): Promise<void> => {
   }
 
   setupMIDIDevices(midi);
-  midi.addEventListener('statechange', (event) =>
-    setupMIDIDevices(event.target as MIDIAccess)
-  );
+  midi.onstatechange = (event) => setupMIDIDevices(event.target as MIDIAccess);
+};
+
+const setupDragAndDrop = (): void => {
+  container.ondrop = (event: Event) => {
+    event.preventDefault();
+
+    const transfer = (event as DragEvent).dataTransfer;
+    if (!transfer) {
+      return;
+    }
+
+    const files = [...transfer.items].filter((item) => item.kind === 'file');
+    if (files.length === 0) {
+      return;
+    }
+    // Not null because item.kind === 'file'
+    const file = files[0].getAsFile()!;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      mutateCurrentPDF(() => (currentPDF = reader.result));
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  container.ondragover = (event: Event) => {
+    event.preventDefault();
+  };
 };
 
 const main = async (): Promise<void> => {
-  mutateCurrentPDF(() => (currentPDF = samplePDF));
+  setupDragAndDrop();
+  // mutateCurrentPDF(() => (currentPDF = samplePDF));
   new ResizeObserver(
     debounce(
       100,
@@ -286,7 +313,4 @@ const main = async (): Promise<void> => {
 main();
 
 // TODO: pdf.js: cmap, font, text/annotation layer
-// TODO: Loading indicator
-// TODO: Glow Effect?
-// TODO: Drag and drop
-// TODO: Minify HTML
+//
