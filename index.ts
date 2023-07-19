@@ -146,7 +146,7 @@ const displayPDF = async (): Promise<void> => {
     ),
   ]);
 
-  container.replaceChildren();
+  let children = [];
   for (const [group, pageNums] of groups) {
     const wrapper = document.createElement('div');
     wrapper.classList.add('swiper-slide');
@@ -165,8 +165,9 @@ const displayPDF = async (): Promise<void> => {
         }
       }).observe(canvas);
     }
-    container.appendChild(wrapper);
+    children.push(wrapper);
   }
+  container.replaceChildren(...children);
 };
 
 // https://webmidi-examples.glitch.me
