@@ -9,19 +9,38 @@ body {
 .visualizer {
   --inactive: #aeaeae;
   background: var(--inactive);
+  position: relative;
+  z-index: 1;
+}
+
+.effect {
+  position: absolute;
+  height: 50px;
+  width: 100%;
+}
+
+.effect.below {
+  top: 100%;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent);
+}
+
+.effect.above {
+  bottom: 100%;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
 }
 
 .swiper {
   width: 100%;
-}
-
-.swiper-wrapper {
-  position: relative;
+  z-index: 0;
 }
 
 .group {
   display: flex;
   width: min-content;
+}
+
+.group:not(.swiper-slide-active) {
+  opacity: 0.3;
 }
 
 .canvas-wrapper {
@@ -31,10 +50,6 @@ body {
 .canvas-wrapper > canvas {
   position: absolute;
   height: 100%;
-}
-
-.group:not(.swiper-slide-active) {
-  opacity: 0.3;
 }
 
 #welcome {

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +7,9 @@
     <title>Score Viewer</title>
   </head>
   <body>
-    <section class="visualizer" inert></section>
+    <section class="visualizer" inert>
+      <div class="effect below"></div>
+    </section>
     <section class="swiper">
       <div id="container" class="swiper-wrapper">
         <div id="welcome" class="swiper-slice">
@@ -16,7 +18,9 @@
       </div>
       <div class="swiper-pagination"></div>
     </section>
-    <section class="visualizer" inert></section>
+    <section class="visualizer" inert>
+      <div class="effect above"></div>
+    </section>
     <input type="file" id="input" accept="application/pdf" />
     <script type="module" src="/index.ts"></script>
   </body>

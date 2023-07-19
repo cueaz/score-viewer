@@ -44,6 +44,7 @@ const swiper = new Swiper('.swiper', {
 const dpr = window.devicePixelRatio || 1;
 const container = document.querySelector<HTMLElement>('#container')!;
 const visualizers = document.querySelectorAll<HTMLElement>('.visualizer');
+const effects = document.querySelectorAll<HTMLElement>('.effect');
 
 const renderPage = async (
   pdf: pdfjs.PDFDocumentProxy,
@@ -206,7 +207,6 @@ const setupMIDIDevices = (midi: MIDIAccess): void => {
   for (const entry of midi.inputs.values()) {
     console.log(
       `Input port [type:'${entry.type}']` +
-        ` id:'${entry.id}'` +
         ` manufacturer:'${entry.manufacturer}'` +
         ` name:'${entry.name}'` +
         ` version:'${entry.version}'`
@@ -237,6 +237,9 @@ const visualizeMIDI = (): void => {
     for (const visualizer of visualizers) {
       visualizer.style.background = inactiveColor;
     }
+    for (const effect of effects) {
+      effect.style.background = 'transparent';
+    }
     return;
   }
 
@@ -246,11 +249,15 @@ const visualizeMIDI = (): void => {
   const ratios = [...colors.keys(), colors.length].map(
     (i) => `${(i / colors.length) * 100}%`
   );
-  const gradient = colors
-    .map((color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`)
-    .join(', ');
+  const breaks = colors.map(
+    (color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`
+  );
+  const gradient = `linear-gradient(to right, ${breaks.join(', ')})`;
   for (const visualizer of visualizers) {
-    visualizer.style.background = `linear-gradient(to right, ${gradient})`;
+    visualizer.style.background = gradient;
+  }
+  for (const effect of effects) {
+    effect.style.background = gradient;
   }
 };
 
