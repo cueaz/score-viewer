@@ -22,6 +22,9 @@ dependencies:
     version: 5.0.0
 
 devDependencies:
+  prettier:
+    specifier: ^3.0.0
+    version: 3.0.0
   typescript:
     specifier: ^5.0.2
     version: 5.0.2
@@ -646,6 +649,12 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /prettier@3.0.0:
+    resolution: {integrity: sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /readable-stream@3.6.2:

@@ -44,7 +44,8 @@ const swiper = new Swiper('.swiper', {
 });
 
 const dpr = window.devicePixelRatio || 1;
-const container = document.querySelector('#container')!;
+const container = document.querySelector<HTMLElement>('#container')!;
+const visualizers = document.querySelectorAll<HTMLElement>('.visualizer');
 
 const renderPage = async (
   pdf: pdfjs.PDFDocumentProxy,
@@ -75,8 +76,6 @@ const renderPage = async (
 
   return canvas;
 };
-
-// type SlideElement = HTMLElement & { progress: number };
 
 // At most one PDF is displayed at a time, use a global variable for simplicity
 let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
@@ -181,13 +180,13 @@ const printMIDIDevices = (midi: MIDIAccess): void => {
 // https://webmidi-examples.glitch.me/
 const parseMIDIMessage = (
   data: Uint8Array
-): { command: number; pitch: number; velocity: number } => {
+): { command: number; note: number; velocity: number } => {
   const command = data[0] >> 4;
-  const pitch = data[1];
+  const note = data[1];
   const velocity = data.length > 2 ? data[2] : 1;
   return {
     command,
-    pitch,
+    note,
     velocity,
   };
 };
@@ -199,25 +198,65 @@ const noteOff = 8;
 
 const onMIDIMessage = (event: Event): void => {
   const e = event as MIDIMessageEvent;
-  const { command, pitch, velocity } = parseMIDIMessage(e.data);
+  const { command, note, velocity } = parseMIDIMessage(e.data);
   const timestamp = e.timeStamp;
 
   if (command === noteOff || (command === noteOn && velocity === 0)) {
-    notesOn.delete(pitch);
+    notesOn.delete(note);
+    visualizeMIDI();
   } else if (command === noteOn) {
-    notesOn.set(pitch, timestamp);
+    notesOn.set(note, timestamp);
+    visualizeMIDI();
   }
 };
 
-const setupMIDIDevices = (midi: MIDIAccess) => {
+const setupMIDIDevices = (midi: MIDIAccess): void => {
   printMIDIDevices(midi);
-  midi.inputs.forEach((entry) => {
+  for (const entry of midi.inputs.values()) {
     // Override onmidimessage
     entry.onmidimessage = onMIDIMessage;
-  });
+  }
 };
 
-const setupMIDI = async () => {
+const noteColors = [
+  '#f38a9c',
+  '#29c0e6',
+  '#e29f49',
+  '#9fa4fe',
+  '#93be63',
+  '#e48dc8',
+  '#07c8c0',
+  '#f3906e',
+  '#6bb4fd',
+  '#c1b043',
+  '#c796eb',
+  '#58c792',
+]; // total 12
+const inactiveColor = 'var(--inactive)';
+
+const visualizeMIDI = (): void => {
+  if (notesOn.size === 0) {
+    for (const visualizer of visualizers) {
+      visualizer.style.background = inactiveColor;
+    }
+    return;
+  }
+
+  const colors = [...notesOn.keys()]
+    .sort()
+    .map((note) => noteColors[note % noteColors.length]);
+  const ratios = [...colors.keys(), colors.length].map(
+    (i) => `${(i / colors.length) * 100}%`
+  );
+  const gradient = colors
+    .map((color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`)
+    .join(', ');
+  for (const visualizer of visualizers) {
+    visualizer.style.background = `linear-gradient(to right, ${gradient})`;
+  }
+};
+
+const setupMIDI = async (): Promise<void> => {
   let midi: MIDIAccess | null = null;
   try {
     midi = await navigator.requestMIDIAccess();
@@ -225,13 +264,14 @@ const setupMIDI = async () => {
     console.log(e);
     return;
   }
+
   setupMIDIDevices(midi);
   midi.addEventListener('statechange', (event) =>
     setupMIDIDevices(event.target as MIDIAccess)
   );
 };
 
-const main = async () => {
+const main = async (): Promise<void> => {
   currentPDF = samplePDF;
   displayPDF();
   new ResizeObserver(
