@@ -78,7 +78,11 @@ const renderPage = async (
 
 // At most one PDF is displayed at a time, use a global variable for simplicity
 let currentPDF: string | URL | Uint8Array | ArrayBuffer | null = null;
-const sep = ',';
+const mutateCurrentPDF = <T>(func: () => T): T => {
+  const res = func();
+  displayPDF();
+  return res;
+};
 
 const displayPDF = async (): Promise<void> => {
   if (!currentPDF) {
@@ -86,6 +90,7 @@ const displayPDF = async (): Promise<void> => {
   }
   const pdf = await pdfjs.getDocument(currentPDF).promise;
 
+  const sep = ',';
   // Render visible page first (left, active, right)
   const minIndex = Math.max(swiper.activeIndex - 1, 0);
   const maxIndex = Math.min(swiper.activeIndex + 1, swiper.slides.length - 1);
@@ -151,32 +156,7 @@ const displayPDF = async (): Promise<void> => {
   }
 };
 
-// https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API
-const printMIDIDevices = (midi: MIDIAccess): void => {
-  for (const entry of midi.inputs) {
-    const input = entry[1];
-    console.log(
-      `Input port [type:'${input.type}']` +
-        ` id:'${input.id}'` +
-        ` manufacturer:'${input.manufacturer}'` +
-        ` name:'${input.name}'` +
-        ` version:'${input.version}'`
-    );
-  }
-
-  for (const entry of midi.outputs) {
-    const output = entry[1];
-    console.log(
-      `Output port [type:'${output.type}']` +
-        ` id:'${output.id}'` +
-        ` manufacturer:'${output.manufacturer}'` +
-        ` name:'${output.name}'` +
-        ` version:'${output.version}'`
-    );
-  }
-};
-
-// https://webmidi-examples.glitch.me/
+// https://webmidi-examples.glitch.me
 const parseMIDIMessage = (
   data: Uint8Array
 ): { command: number; note: number; velocity: number } => {
@@ -191,6 +171,11 @@ const parseMIDIMessage = (
 };
 
 let notesOn = new Map<number, number>();
+const mutateNotesOn = <T>(func: () => T): T => {
+  const res = func();
+  visualizeMIDI();
+  return res;
+};
 
 const noteOn = 9;
 const noteOff = 8;
@@ -201,17 +186,22 @@ const onMIDIMessage = (event: Event): void => {
   const timestamp = e.timeStamp;
 
   if (command === noteOff || (command === noteOn && velocity === 0)) {
-    notesOn.delete(note);
-    visualizeMIDI();
+    mutateNotesOn(() => notesOn.delete(note));
   } else if (command === noteOn) {
-    notesOn.set(note, timestamp);
-    visualizeMIDI();
+    mutateNotesOn(() => notesOn.set(note, timestamp));
   }
 };
 
 const setupMIDIDevices = (midi: MIDIAccess): void => {
-  printMIDIDevices(midi);
+  // https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API
   for (const entry of midi.inputs.values()) {
+    console.log(
+      `Input port [type:'${entry.type}']` +
+        ` id:'${entry.id}'` +
+        ` manufacturer:'${entry.manufacturer}'` +
+        ` name:'${entry.name}'` +
+        ` version:'${entry.version}'`
+    );
     // Override onmidimessage
     entry.onmidimessage = onMIDIMessage;
   }
@@ -273,8 +263,7 @@ const setupMIDI = async (): Promise<void> => {
 };
 
 const main = async (): Promise<void> => {
-  currentPDF = samplePDF;
-  displayPDF();
+  mutateCurrentPDF(() => (currentPDF = samplePDF));
   new ResizeObserver(
     debounce(
       100,
@@ -298,8 +287,6 @@ main();
 
 // TODO: pdf.js: cmap, font, text/annotation layer
 // TODO: Loading indicator
-// TODO: Navigation
 // TODO: Glow Effect?
-// TODO: On window size change
 // TODO: Drag and drop
 // TODO: Minify HTML
