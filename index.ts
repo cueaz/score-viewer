@@ -12,7 +12,7 @@ import { Pagination, Mousewheel, Keyboard } from 'swiper/modules';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url
+  import.meta.url,
 ).toString();
 
 const swiper = new Swiper('.swiper', {
@@ -47,7 +47,7 @@ const effects = document.querySelectorAll<HTMLElement>('.effect');
 
 const renderPage = async (
   pdf: pdfjs.PDFDocumentProxy,
-  pageNum: number
+  pageNum: number,
 ): Promise<HTMLCanvasElement> => {
   const page = await pdf.getPage(pageNum);
 
@@ -82,7 +82,7 @@ const mutateCurrentPDF = async <T>(func: () => Promise<T>): Promise<T> => {
 let cachedCanvases: HTMLCanvasElement[] | null = null;
 const displayPDF = async (
   reload: boolean,
-  containerRect?: DOMRectReadOnly
+  containerRect?: DOMRectReadOnly,
 ): Promise<void> => {
   if (!currentPDF) {
     return;
@@ -95,12 +95,12 @@ const displayPDF = async (
   } else {
     canvases = (
       await Promise.allSettled(
-        [...Array(pdf.numPages).keys()].map((i) => renderPage(pdf, i + 1))
+        [...Array(pdf.numPages).keys()].map((i) => renderPage(pdf, i + 1)),
       )
     )
       .filter((result) => result.status === 'fulfilled')
       .map(
-        (result) => (result as PromiseFulfilledResult<HTMLCanvasElement>).value
+        (result) => (result as PromiseFulfilledResult<HTMLCanvasElement>).value,
       );
     cachedCanvases = canvases;
   }
@@ -136,7 +136,7 @@ const displayPDF = async (
     groups.every(
       (group, i) =>
         container.children[i] instanceof HTMLElement &&
-        group.length === container.children[i].children.length
+        group.length === container.children[i].children.length,
     );
 
   if (reload || !nestedLengthEqual) {
@@ -156,7 +156,7 @@ const displayPDF = async (
 
 // https://webmidi-examples.glitch.me
 const parseMIDIMessage = (
-  data: Uint8Array
+  data: Uint8Array,
 ): { command: number; note: number; velocity: number } => {
   const command = data[0] >> 4;
   const note = data[1];
@@ -197,7 +197,7 @@ const setupMIDIDevices = (midi: MIDIAccess): void => {
       `Input port [type:'${entry.type}']` +
         ` manufacturer:'${entry.manufacturer}'` +
         ` name:'${entry.name}'` +
-        ` version:'${entry.version}'`
+        ` version:'${entry.version}'`,
     );
     // Override onmidimessage
     entry.onmidimessage = onMIDIMessage;
@@ -235,10 +235,10 @@ const visualizeMIDI = (): void => {
     .sort((a, b) => a - b)
     .map((note) => noteColors[note % noteColors.length]);
   const ratios = [...colors.keys(), colors.length].map(
-    (i) => `${(i / colors.length) * 100}%`
+    (i) => `${(i / colors.length) * 100}%`,
   );
   const breaks = colors.map(
-    (color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`
+    (color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`,
   );
   const gradient = `linear-gradient(to right, ${breaks.join(', ')})`;
   for (const visualizer of visualizers) {
@@ -329,5 +329,3 @@ main();
 // TODO: Minify HTML
 // TODO: Track visible page number when group changes
 // TODO: Logo
-
-
