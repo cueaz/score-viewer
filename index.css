@@ -15,18 +15,28 @@ body {
 
 .effect {
   position: absolute;
-  height: 50px;
+  height: 40px;
   width: 100%;
 }
 
 .effect.below {
   top: 100%;
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent);
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.1) 30%,
+    transparent
+  );
 }
 
 .effect.above {
   bottom: 100%;
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+  mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.1) 30%,
+    transparent
+  );
 }
 
 .swiper {
