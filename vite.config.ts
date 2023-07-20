@@ -2,6 +2,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { ViteMinifyPlugin } from 'vite-plugin-minify';
 import autoprefixer from 'autoprefixer';
 
 const require = createRequire(import.meta.url);
@@ -25,6 +26,7 @@ export default defineConfig({
         },
       ],
     }),
+    ViteMinifyPlugin(),
   ],
   build: {
     rollupOptions: {

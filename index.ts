@@ -341,6 +341,5 @@ main();
 
 // TODO: pdf.js: text/annotation layer
 // TODO: Loading indicator?
-// TODO: Minify HTML
-// TODO: RTL Direction/Writing Mode
-// TODO: Wheel zoom
+// TODO: RTL Direction/Writing Mode?
+// TODO: Wheel zoom?
