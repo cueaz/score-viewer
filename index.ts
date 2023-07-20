@@ -29,9 +29,6 @@ const swiper = new Swiper('.swiper', {
   centeredSlides: true,
   slideToClickedSlide: true,
 
-  // observer: true,
-  // observeParents: true,
-
   modules: [Pagination, Mousewheel, Keyboard],
 
   pagination: {
@@ -198,9 +195,9 @@ const setupMIDIDevices = (midi: MIDIAccess): void => {
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API
   for (const entry of midi.inputs.values()) {
     console.log(
-      `Input port [type:'${entry.type}']` +
-        ` manufacturer:'${entry.manufacturer}'` +
+      `Port [type:${entry.type}]` +
         ` name:'${entry.name}'` +
+        ` manufacturer:'${entry.manufacturer}'` +
         ` version:'${entry.version}'`,
     );
     // Override onmidimessage

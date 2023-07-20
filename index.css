@@ -17,15 +17,18 @@ body {
   position: absolute;
   height: 40px;
   width: 100%;
+  --break-1: rgba(0, 0, 0, 0.3);
+  --break-2: rgba(0, 0, 0, 0.1) 30%;
+  --break-3: transparent;
 }
 
 .effect.below {
   top: 100%;
   mask-image: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.3),
-    rgba(0, 0, 0, 0.1) 30%,
-    transparent
+    var(--break-1),
+    var(--break-2),
+    var(--break-3)
   );
 }
 
@@ -33,9 +36,9 @@ body {
   bottom: 100%;
   mask-image: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.3),
-    rgba(0, 0, 0, 0.1) 30%,
-    transparent
+    var(--break-1),
+    var(--break-2),
+    var(--break-3)
   );
 }
 
