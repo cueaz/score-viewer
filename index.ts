@@ -339,10 +339,8 @@ const main = (): void => {
 
 main();
 
-// TODO: pdf.js: cmap, font, text/annotation layer
+// TODO: pdf.js: text/annotation layer
 // TODO: Loading indicator?
 // TODO: Minify HTML
-// TODO: Track visible page number when group changes
-// TODO: Logo
-// TODO: RTL vertical
+// TODO: RTL Direction/Writing Mode
 // TODO: Wheel zoom
