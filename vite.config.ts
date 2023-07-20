@@ -1,13 +1,37 @@
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import autoprefixer from 'autoprefixer';
 
+const require = createRequire(import.meta.url);
+const prefix = '_';
+
+const pdfjsRoot = path.dirname(require.resolve('pdfjs-dist/package.json'));
+
 export default defineConfig({
+  plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: path.join(pdfjsRoot, 'cmaps'),
+          dest: prefix,
+          rename: 'cm',
+        },
+        {
+          src: path.join(pdfjsRoot, 'standard_fonts'),
+          dest: prefix,
+          rename: 'sf',
+        },
+      ],
+    }),
+  ],
   build: {
     rollupOptions: {
       output: {
-        entryFileNames: '_/[hash:8].js',
-        chunkFileNames: '_/[hash:8].js',
-        assetFileNames: '_/[hash:8].[ext]',
+        entryFileNames: `${prefix}/[hash:8].js`,
+        chunkFileNames: `${prefix}/[hash:8].js`,
+        assetFileNames: `${prefix}/[hash:8].[ext]`,
       },
     },
   },

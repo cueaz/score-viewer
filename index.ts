@@ -15,6 +15,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
+const cmapPath = '/_/cm/';
+const fontPath = '/_/sf/';
+
 const swiper = new Swiper('.swiper', {
   cssMode: true,
 
@@ -263,12 +266,23 @@ const setupMIDI = async (): Promise<void> => {
   midi.onstatechange = () => midi && setupMIDIDevices(midi);
 };
 
+const getPDFDocument = async (
+  source: string | URL | ArrayBuffer,
+): Promise<pdfjs.PDFDocumentProxy> => {
+  const options = {
+    cMapUrl: cmapPath,
+    standardFontDataUrl: fontPath,
+    ...(source instanceof ArrayBuffer ? { data: source } : { url: source }),
+  };
+  return await pdfjs.getDocument(options).promise;
+};
+
 const readFileToPDF = (file: File): void => {
   const reader = new FileReader();
   reader.onload = () => {
     const result = reader.result as ArrayBuffer;
     mutateCurrentPDF(async () => {
-      currentPDF = await pdfjs.getDocument(result).promise;
+      currentPDF = await getPDFDocument(result);
     });
   };
   reader.readAsArrayBuffer(file);
