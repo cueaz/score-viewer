@@ -55,6 +55,10 @@ body {
   opacity: 0.3;
 }
 
+.page {
+  position: relative;
+}
+
 #welcome {
   display: flex;
   flex-flow: column nowrap;

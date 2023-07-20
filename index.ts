@@ -1,5 +1,5 @@
 import '@unocss/reset/tailwind.css';
-// import 'pdfjs-dist/web/pdf_viewer.css';
+import 'pdfjs-dist/web/pdf_viewer.css';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/mousewheel';
@@ -12,7 +12,7 @@ import { Pagination, Mousewheel, Keyboard } from 'swiper/modules';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
+  import.meta.url
 ).toString();
 
 const cmapPath = '/_/cm/';
@@ -44,22 +44,36 @@ const swiper = new Swiper('.swiper', {
 });
 
 const dpr = window.devicePixelRatio || 1;
+const screenHeight = window.screen.height;
+
 const container = document.querySelector<HTMLElement>('#container')!;
 const visualizers = document.querySelectorAll<HTMLElement>('.visualizer');
 const effects = document.querySelectorAll<HTMLElement>('.effect');
 
+type Page = {
+  page: pdfjs.PDFPageProxy;
+  canvas: HTMLCanvasElement;
+  textLayer: HTMLDivElement;
+};
+
+const computeViewport = (
+  page: pdfjs.PDFPageProxy,
+  height: number
+): pdfjs.PageViewport =>
+  page.getViewport({
+    scale: height / page.getViewport({ scale: 1 }).height,
+  });
+
 const renderPage = async (
   pdf: pdfjs.PDFDocumentProxy,
-  pageNum: number,
-): Promise<HTMLCanvasElement> => {
+  pageNum: number
+): Promise<Page> => {
   const page = await pdf.getPage(pageNum);
 
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d')!;
 
-  const viewport = page.getViewport({
-    scale: window.screen.height / page.getViewport({ scale: 1 }).height,
-  });
+  const viewport = computeViewport(page, screenHeight);
   canvas.width = Math.floor(viewport.width * dpr);
   canvas.height = Math.floor(viewport.height * dpr);
 
@@ -72,7 +86,21 @@ const renderPage = async (
   // Do not wait render
   page.render(renderContext);
 
-  return canvas;
+  // Text layer
+  const textLayer = document.createElement('div');
+  textLayer.classList.add('textLayer');
+  textLayer.style.setProperty('--scale-factor', `${viewport.scale}`);
+
+  (async () => {
+    const textContent = await page.getTextContent();
+    pdfjs.renderTextLayer({
+      textContentSource: textContent,
+      container: textLayer,
+      viewport,
+    });
+  })();
+
+  return { page, canvas, textLayer };
 };
 
 let currentPDF: pdfjs.PDFDocumentProxy | null = null;
@@ -82,30 +110,28 @@ const mutateCurrentPDF = async <T>(func: () => Promise<T>): Promise<T> => {
   return res;
 };
 
-let cachedCanvases: HTMLCanvasElement[] | null = null;
+let cachedPages: Page[] | null = null;
 const displayPDF = async (
   reload: boolean,
-  containerRect?: DOMRectReadOnly,
+  containerRect?: DOMRectReadOnly
 ): Promise<void> => {
   if (!currentPDF) {
     return;
   }
   const pdf = currentPDF;
 
-  let canvases;
-  if (!reload && cachedCanvases) {
-    canvases = cachedCanvases;
+  let pages;
+  if (!reload && cachedPages) {
+    pages = cachedPages;
   } else {
-    canvases = (
+    pages = (
       await Promise.allSettled(
-        [...Array(pdf.numPages).keys()].map((i) => renderPage(pdf, i + 1)),
+        [...Array(pdf.numPages).keys()].map((i) => renderPage(pdf, i + 1))
       )
     )
       .filter((result) => result.status === 'fulfilled')
-      .map(
-        (result) => (result as PromiseFulfilledResult<HTMLCanvasElement>).value,
-      );
-    cachedCanvases = canvases;
+      .map((result) => (result as PromiseFulfilledResult<Page>).value);
+    cachedPages = pages;
   }
 
   const containerWidth = containerRect?.width || container.clientWidth;
@@ -114,42 +140,54 @@ const displayPDF = async (
   let groups = [];
   let prevIndex = 0;
   let currWidth = 0;
-  for (const [index, canvas] of canvases.entries()) {
+  for (const [index, page] of pages.entries()) {
+    const { page: p, canvas, textLayer } = page;
     // canvas aspect ratio * container.height = width
     const width = (canvas.width / canvas.height) * containerHeight;
     currWidth += width;
     if (currWidth > containerWidth) {
       // prevIndex <= index - 1 unless index === 0
-      const group = canvases.slice(prevIndex, index);
+      const group = pages.slice(prevIndex, index);
       if (group.length > 0) {
         groups.push(group);
       }
       prevIndex = index;
       currWidth = width;
     }
-    // Update canvas rect
+    // Update children sizing
     canvas.style.width = `${width}px`;
     canvas.style.height = `${containerHeight}px`;
+    const viewport = computeViewport(p, containerHeight);
+    textLayer.style.setProperty('--scale-factor', `${viewport.scale}`);
+    pdfjs.updateTextLayer({
+      container: textLayer,
+      viewport,
+      textDivs: [],
+    });
   }
   // Push the rest
-  groups.push(canvases.slice(prevIndex));
+  groups.push(pages.slice(prevIndex));
 
-  const nestedEqual =
-    container.children.length === groups.length &&
+  const nestedLengthEqual =
+    groups.length === container.children.length &&
     groups.every(
       (group, i) =>
         container.children[i] instanceof HTMLElement &&
-        group.length === container.children[i].children.length &&
-        group.every((group, j) => group === container.children[i].children[j]),
+        group.length === container.children[i].children.length
     );
 
-  if (reload || !nestedEqual) {
+  if (reload || !nestedLengthEqual) {
     let children = [];
     for (const group of groups) {
       const wrapper = document.createElement('div');
       wrapper.classList.add('swiper-slide');
       wrapper.classList.add('group');
-      wrapper.append(...group);
+      for (const { canvas, textLayer } of group) {
+        const pageWrapper = document.createElement('div');
+        pageWrapper.classList.add('page');
+        pageWrapper.append(canvas, textLayer);
+        wrapper.appendChild(pageWrapper);
+      }
       children.push(wrapper);
     }
     container.replaceChildren(...children);
@@ -160,7 +198,7 @@ const displayPDF = async (
 
 // https://webmidi-examples.glitch.me
 const parseMIDIMessage = (
-  data: Uint8Array,
+  data: Uint8Array
 ): { command: number; note: number; velocity: number } => {
   const command = data[0] >> 4;
   const note = data[1];
@@ -201,7 +239,7 @@ const setupMIDIDevices = (midi: MIDIAccess): void => {
       `Input port [type:'${entry.type}']` +
         ` manufacturer:'${entry.manufacturer}'` +
         ` name:'${entry.name}'` +
-        ` version:'${entry.version}'`,
+        ` version:'${entry.version}'`
     );
     // Override onmidimessage
     entry.onmidimessage = onMIDIMessage;
@@ -239,10 +277,10 @@ const visualizeMIDI = (): void => {
     .sort((a, b) => a - b)
     .map((note) => noteColors[note % noteColors.length]);
   const ratios = [...colors.keys(), colors.length].map(
-    (i) => `${(i / colors.length) * 100}%`,
+    (i) => `${(i / colors.length) * 100}%`
   );
   const breaks = colors.map(
-    (color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`,
+    (color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`
   );
   const gradient = `linear-gradient(to right, ${breaks.join(', ')})`;
   for (const visualizer of visualizers) {
@@ -268,7 +306,7 @@ const setupMIDI = async (): Promise<void> => {
 };
 
 const getPDFDocument = async (
-  source: string | URL | ArrayBuffer,
+  source: string | URL | ArrayBuffer
 ): Promise<pdfjs.PDFDocumentProxy> => {
   const options = {
     cMapUrl: cmapPath,
