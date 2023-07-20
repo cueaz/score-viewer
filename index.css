@@ -57,15 +57,23 @@ body {
 
 #welcome {
   display: flex;
+  flex-flow: column nowrap;
   align-items: center;
   justify-content: center;
   width: 100%;
 }
 
 .info {
+  text-transform: uppercase;
+}
+
+.info.level-1 {
   font-size: 2rem;
   font-weight: bold;
-  text-transform: uppercase;
+}
+
+.info.level-2 {
+  font-size: 1.2rem;
 }
 
 #input {

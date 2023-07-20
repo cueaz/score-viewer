@@ -311,7 +311,7 @@ const setupDragAndDrop = (): void => {
   };
 };
 
-const main = async (): Promise<void> => {
+const main = (): void => {
   setupDragAndDrop();
   setupFileInput();
   setupMIDI();
@@ -329,3 +329,5 @@ main();
 // TODO: Minify HTML
 // TODO: Track visible page number when group changes
 // TODO: Logo
+// TODO: RTL vertical
+// TODO: Wheel zoom
