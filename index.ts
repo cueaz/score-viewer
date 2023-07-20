@@ -134,15 +134,16 @@ const displayPDF = async (
   // Push the rest
   groups.push(canvases.slice(prevIndex));
 
-  const nestedLengthEqual =
+  const nestedEqual =
     container.children.length === groups.length &&
     groups.every(
       (group, i) =>
         container.children[i] instanceof HTMLElement &&
-        group.length === container.children[i].children.length,
+        group.length === container.children[i].children.length &&
+        group.every((group, j) => group === container.children[i].children[j]),
     );
 
-  if (reload || !nestedLengthEqual) {
+  if (reload || !nestedEqual) {
     let children = [];
     for (const group of groups) {
       const wrapper = document.createElement('div');
