@@ -1,4 +1,5 @@
 import '@unocss/reset/tailwind.css';
+// For text/annotation layers
 // import 'pdfjs-dist/web/pdf_viewer.css';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -41,14 +42,20 @@ const swiper = new Swiper('.swiper', {
 });
 
 const dpr = window.devicePixelRatio || 1;
+
 const container = document.querySelector<HTMLElement>('#container')!;
 const visualizers = document.querySelectorAll<HTMLElement>('.visualizer');
 const effects = document.querySelectorAll<HTMLElement>('.effect');
 
+type Page = {
+  wrapper: HTMLDivElement;
+  canvas: HTMLCanvasElement;
+};
+
 const renderPage = async (
   pdf: pdfjs.PDFDocumentProxy,
   pageNum: number,
-): Promise<HTMLCanvasElement> => {
+): Promise<Page> => {
   const page = await pdf.getPage(pageNum);
 
   const canvas = document.createElement('canvas');
@@ -66,20 +73,34 @@ const renderPage = async (
     viewport,
     transform,
   };
-  // Do not wait render
-  page.render(renderContext);
 
-  return canvas;
+  const overlay = document.createElement('div');
+  overlay.classList.add('overlay');
+  const spinner = document.createElement('div');
+  spinner.classList.add('spinner');
+  overlay.append(spinner);
+
+  // Do not wait render
+  (async () => {
+    await page.render(renderContext).promise;
+    overlay.remove();
+  })();
+
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('page');
+  wrapper.append(canvas, overlay);
+
+  return { wrapper, canvas };
 };
 
 let currentPDF: pdfjs.PDFDocumentProxy | null = null;
 const mutateCurrentPDF = async <T>(func: () => Promise<T>): Promise<T> => {
   const res = await func();
-  displayPDF(true); // Do not await
+  displayPDF(true); // Do not wait
   return res;
 };
 
-let cachedCanvases: HTMLCanvasElement[] | null = null;
+let cachedPages: Page[] | null = null;
 const displayPDF = async (
   reload: boolean,
   containerRect?: DOMRectReadOnly,
@@ -89,20 +110,18 @@ const displayPDF = async (
   }
   const pdf = currentPDF;
 
-  let canvases;
-  if (!reload && cachedCanvases) {
-    canvases = cachedCanvases;
+  let pages;
+  if (!reload && cachedPages) {
+    pages = cachedPages;
   } else {
-    canvases = (
+    pages = (
       await Promise.allSettled(
         [...Array(pdf.numPages).keys()].map((i) => renderPage(pdf, i + 1)),
       )
     )
       .filter((result) => result.status === 'fulfilled')
-      .map(
-        (result) => (result as PromiseFulfilledResult<HTMLCanvasElement>).value,
-      );
-    cachedCanvases = canvases;
+      .map((result) => (result as PromiseFulfilledResult<Page>).value);
+    cachedPages = pages;
   }
 
   const containerWidth = containerRect?.width || container.clientWidth;
@@ -111,13 +130,13 @@ const displayPDF = async (
   let groups = [];
   let prevIndex = 0;
   let currWidth = 0;
-  for (const [index, canvas] of canvases.entries()) {
+  for (const [index, { canvas }] of pages.entries()) {
     // canvas aspect ratio * container.height = width
     const width = (canvas.width / canvas.height) * containerHeight;
     currWidth += width;
     if (currWidth > containerWidth) {
       // prevIndex <= index - 1 unless index === 0
-      const group = canvases.slice(prevIndex, index);
+      const group = pages.slice(prevIndex, index);
       if (group.length > 0) {
         groups.push(group);
       }
@@ -129,24 +148,23 @@ const displayPDF = async (
     canvas.style.height = `${containerHeight}px`;
   }
   // Push the rest
-  groups.push(canvases.slice(prevIndex));
+  groups.push(pages.slice(prevIndex));
 
-  const nestedEqual =
+  const nestedLengthEqual =
     container.children.length === groups.length &&
     groups.every(
       (group, i) =>
         container.children[i] instanceof HTMLElement &&
-        group.length === container.children[i].children.length &&
-        group.every((group, j) => group === container.children[i].children[j]),
+        group.length === container.children[i].children.length,
     );
 
-  if (reload || !nestedEqual) {
+  if (reload || !nestedLengthEqual) {
     let children = [];
     for (const group of groups) {
       const wrapper = document.createElement('div');
       wrapper.classList.add('swiper-slide');
       wrapper.classList.add('group');
-      wrapper.append(...group);
+      wrapper.append(...group.map(({ wrapper: w }) => w));
       children.push(wrapper);
     }
     container.replaceChildren(...children);
@@ -155,10 +173,14 @@ const displayPDF = async (
   swiper.update();
 };
 
+type Message = {
+  command: number;
+  note: number;
+  velocity: number;
+};
+
 // https://webmidi-examples.glitch.me
-const parseMIDIMessage = (
-  data: Uint8Array,
-): { command: number; note: number; velocity: number } => {
+const parseMIDIMessage = (data: Uint8Array): Message => {
   const command = data[0] >> 4;
   const note = data[1];
   const velocity = data.length > 2 ? data[2] : 1;
@@ -337,6 +359,5 @@ const main = (): void => {
 main();
 
 // TODO: pdf.js: text/annotation layer
-// TODO: Loading indicator?
 // TODO: RTL Direction/Writing Mode?
 // TODO: Wheel zoom?

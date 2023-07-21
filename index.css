@@ -17,8 +17,8 @@ body {
   position: absolute;
   height: 40px;
   width: 100%;
-  --break-1: rgba(0, 0, 0, 0.3);
-  --break-2: rgba(0, 0, 0, 0.1) 30%;
+  --break-1: rgb(0 0 0 / 0.3);
+  --break-2: rgb(0 0 0 / 0.1) 30%;
   --break-3: transparent;
 }
 
@@ -44,7 +44,7 @@ body {
 
 .swiper {
   flex: 1 1 auto;
-  overflow: hidden; /* key property to fit canvas size to parent when shrinking page */
+  overflow: hidden;
   width: 100%;
   z-index: 0;
 }
@@ -56,6 +56,22 @@ body {
 
 .group:not(.swiper-slide-active) {
   opacity: 0.3;
+}
+
+.page {
+  display: grid;
+}
+
+.page > * {
+  grid-area: 1 / 1;
+}
+
+.overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 0.7);
+  backdrop-filter: blur(3px);
 }
 
 #welcome {
@@ -81,4 +97,33 @@ body {
 
 #input {
   display: none;
+}
+
+/* Imported from loading.io */
+.spinner {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.spinner:after {
+  content: ' ';
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  --color: rgb(0 0 0 / 0.2);
+  border: 6px solid var(--color);
+  border-color: var(--color) transparent var(--color) transparent;
+  animation: spinner 1.2s linear infinite;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
