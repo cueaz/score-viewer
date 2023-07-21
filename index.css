@@ -3,6 +3,7 @@ body {
   flex-flow: column nowrap;
   height: 100vh;
   overflow: hidden;
+  background: #fff;
 }
 
 .visualizer {
@@ -74,7 +75,7 @@ body {
   backdrop-filter: blur(3px);
 }
 
-#welcome {
+.welcome {
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
@@ -92,7 +93,17 @@ body {
 }
 
 .info.level-2 {
-  font-size: 1.2rem;
+  font-size: 1rem;
+}
+
+#upload {
+  text-decoration: underline dotted;
+  color: var(--swiper-theme-color, blue);
+  transition: filter 0.3s ease-in-out;
+}
+
+#upload:hover {
+  filter: brightness(0.7);
 }
 
 #input {

@@ -41,8 +41,6 @@ const swiper = new Swiper('.swiper', {
   keyboard: true,
 });
 
-const dpr = window.devicePixelRatio || 1;
-
 const container = document.querySelector<HTMLElement>('#container')!;
 const visualizers = document.querySelectorAll<HTMLElement>('.visualizer');
 const effects = document.querySelectorAll<HTMLElement>('.effect');
@@ -64,6 +62,8 @@ const renderPage = async (
   const viewport = page.getViewport({
     scale: window.screen.height / page.getViewport({ scale: 1 }).height,
   });
+  const dpr = window.devicePixelRatio || 1;
+
   canvas.width = Math.floor(viewport.width * dpr);
   canvas.height = Math.floor(viewport.height * dpr);
 
@@ -223,7 +223,8 @@ const setupMIDIDevices = (midi: MIDIAccess): void => {
         ` version:'${entry.version}'`,
     );
     // Override onmidimessage
-    entry.onmidimessage = onMIDIMessage;
+    entry.removeEventListener('midimessage', onMIDIMessage);
+    entry.addEventListener('midimessage', onMIDIMessage);
   }
 };
 
@@ -283,7 +284,7 @@ const setupMIDI = async (): Promise<void> => {
     return;
   }
   setupMIDIDevices(midi);
-  midi.onstatechange = () => midi && setupMIDIDevices(midi);
+  midi.addEventListener('statechange', () => midi && setupMIDIDevices(midi));
 };
 
 const getPDFDocument = async (
@@ -299,33 +300,36 @@ const getPDFDocument = async (
 
 const readFileToPDF = (file: File): void => {
   const reader = new FileReader();
-  reader.onload = () => {
-    const result = reader.result as ArrayBuffer;
+  reader.addEventListener('load', () => {
+    const result = reader.result;
+    if (!(result instanceof ArrayBuffer)) {
+      return;
+    }
     mutateCurrentPDF(async () => {
       currentPDF = await getPDFDocument(result);
     });
-  };
+  });
   reader.readAsArrayBuffer(file);
 };
 
 const setupFileInput = (): void => {
-  const welcome = document.querySelector<HTMLElement>('#welcome')!;
+  const upload = document.querySelector<HTMLElement>('#upload')!;
   const input = document.querySelector<HTMLInputElement>('#input')!;
 
-  welcome.onclick = () => input.click();
-  input.onchange = () => {
+  upload.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => {
     if (!input.files || input.files.length === 0) {
       return;
     }
     readFileToPDF(input.files[0]);
-  };
+  });
 };
 
 const setupDragAndDrop = (): void => {
-  container.ondrop = (event: Event) => {
+  document.addEventListener('drop', (event: DragEvent) => {
     event.preventDefault();
 
-    const transfer = (event as DragEvent).dataTransfer;
+    const transfer = event.dataTransfer;
     if (!transfer) {
       return;
     }
@@ -338,14 +342,32 @@ const setupDragAndDrop = (): void => {
       return;
     }
     readFileToPDF(files[0]);
-  };
+  });
 
-  container.ondragover = (event: Event) => {
+  document.addEventListener('dragover', (event: Event) => {
     event.preventDefault();
-  };
+  });
+};
+
+const toggleFullscreen = (): void => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+};
+
+const setupFullscreen = (): void => {
+  document.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      toggleFullscreen();
+    }
+  });
+  document.addEventListener('dblclick', toggleFullscreen);
 };
 
 const main = (): void => {
+  setupFullscreen();
   setupDragAndDrop();
   setupFileInput();
   setupMIDI();
