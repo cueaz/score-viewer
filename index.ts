@@ -16,8 +16,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-const cmapPath = '/_/cm/';
-const fontPath = '/_/sf/';
+const cmapPath = '/-/cm/';
+const fontPath = '/-/sf/';
 
 const swiper = new Swiper('.swiper', {
   cssMode: true,
