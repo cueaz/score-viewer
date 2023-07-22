@@ -281,7 +281,7 @@ const visualizeMIDI = (): void => {
 const setupMIDI = async (): Promise<void> => {
   let midi: MIDIAccess | null = null;
   try {
-    midi = await navigator.requestMIDIAccess();
+    midi = await navigator.requestMIDIAccess({ sysex: false });
   } catch (e) {
     if (e instanceof Error) {
       console.log(e.message);
