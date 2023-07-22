@@ -44,7 +44,7 @@ export default defineConfig({
         name: 'Score Viewer',
         short_name: 'Score Viewer',
         description: 'A Simple PDF Viewer with MIDI Visualization',
-        theme_color: '#ffffff',
+        theme_color: '#aeaeae',
         icons: [
           { src: 'favicon.ico', type: 'image/x-icon', sizes: '16x16 32x32' },
           {
