@@ -61,6 +61,7 @@ body {
 
 .page {
   display: grid;
+  align-items: center;
 }
 
 .page > * {
@@ -81,6 +82,7 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
+  padding: 1rem;
 }
 
 .info {

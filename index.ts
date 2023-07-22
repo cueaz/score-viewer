@@ -144,8 +144,13 @@ const displayPDF = async (
       currWidth = width;
     }
     // Update canvas rect
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${containerHeight}px`;
+    if (width <= containerWidth) {
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${containerHeight}px`;
+    } else {
+      canvas.style.width = `${containerWidth}px`;
+      canvas.style.height = `${(containerWidth / width) * containerHeight}px`;
+    }
   }
   // Push the rest
   groups.push(pages.slice(prevIndex));
@@ -191,7 +196,7 @@ const parseMIDIMessage = (data: Uint8Array): Message => {
   };
 };
 
-let notesOn = new Map<number, number>();
+const notesOn = new Map<number, number>();
 const mutateNotesOn = <T>(func: () => T): T => {
   const res = func();
   visualizeMIDI();
