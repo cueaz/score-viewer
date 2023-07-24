@@ -371,7 +371,25 @@ const setupFullscreen = (): void => {
   document.addEventListener('dblclick', toggleFullscreen);
 };
 
+const requestWakeLock = async () => {
+  try {
+    await navigator.wakeLock.request('screen');
+  } catch (e) {}
+};
+
+const setupWakeLock = (): void => {
+  if ('wakeLock' in navigator) {
+    requestWakeLock();
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible') {
+        await requestWakeLock();
+      }
+    });
+  }
+};
+
 const main = (): void => {
+  setupWakeLock();
   setupFullscreen();
   setupDragAndDrop();
   setupFileInput();

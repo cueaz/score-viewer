@@ -16,6 +16,9 @@ dependencies:
     version: 10.0.4
 
 devDependencies:
+  '@types/dom-screen-wake-lock':
+    specifier: ^1.0.1
+    version: 1.0.1
   '@types/node':
     specifier: ^20.4.2
     version: 20.4.2
@@ -1580,6 +1583,10 @@ packages:
       json5: 2.2.3
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.8
+    dev: true
+
+  /@types/dom-screen-wake-lock@1.0.1:
+    resolution: {integrity: sha512-WJQas3OFGcC8AeMzaa7FwzzbNNfanuV2R12kQYNp4BkUMghsRz5JxJ5RgVhJifhw7t0s6LvRSWZArmKbMDZ+5g==}
     dev: true
 
   /@types/estree@0.0.39:
