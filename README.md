@@ -4,6 +4,8 @@ My makeshift solution to view sheet music and simple MIDI visualization simultan
 
 Deployed at [sv.cueaz.com](https://sv.cueaz.com).
 
+![Preview Image](preview.gif)
+
 ## Browser Support
 
 As of July 2023, Chrome is the only fully supported browser.
