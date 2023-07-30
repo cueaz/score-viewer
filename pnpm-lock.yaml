@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.53.5
     version: 0.53.5
   pdfjs-dist:
-    specifier: ^3.8.162
-    version: 3.8.162
+    specifier: ^3.9.179
+    version: 3.9.179
   swiper:
     specifier: ^10.0.4
     version: 10.0.4
@@ -2875,8 +2875,8 @@ packages:
     dev: false
     optional: true
 
-  /pdfjs-dist@3.8.162:
-    resolution: {integrity: sha512-Do0Lpuk1ItcNnIPr9MM+/jnnMOb4i6asRX7gVnL6fFUW1QPC7ERfHQkbhF7jkAri1o6GxttX0Yn7ZhOmpFUeGA==}
+  /pdfjs-dist@3.9.179:
+    resolution: {integrity: sha512-AZBEIAORYDaOAlM0/A4Zg465+XF3ugYDdgrVmioVvNW5tH3xs3RpGFBYOG5PM9/vLM3M/wNncsMLTgyIKdqMKg==}
     engines: {node: '>=18'}
     optionalDependencies:
       canvas: 2.11.2
