@@ -1,6 +1,6 @@
 # Score Viewer
 
-My makeshift solution to view sheet music and simple MIDI visualization simultaneously.
+My makeshift solution to view sheet music and simple MIDI input visualization simultaneously.
 
 Deployed at [sv.cueaz.com](https://sv.cueaz.com).
 
