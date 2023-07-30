@@ -4,7 +4,7 @@ My makeshift solution to view sheet music and simple MIDI visualization simultan
 
 Deployed at [sv.cueaz.com](https://sv.cueaz.com).
 
-## Support Matrix
+## Browser Support
 
 As of July 2023, Chrome is the only fully supported browser.
 
@@ -12,7 +12,7 @@ As of July 2023, Chrome is the only fully supported browser.
 | ------- | :---------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Chrome  |                                       O                                       |                                               O                                               |                                    O                                     |
 | Firefox |                                       O                                       |                                               X                                               |                                    X                                     |
-| Safari  |                                       X                                       |                                               X                                               |                                    O                                     |
+| Safari  |                                       X                                       |                                               O                                               |                                    O                                     |
 
 ## Limitations
 
