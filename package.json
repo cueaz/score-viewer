@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@types/dom-screen-wake-lock": "^1.0.1",
-    "@types/node": "^20.4.2",
+    "@types/node": "^20.4.5",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.26",
     "prettier": "^3.0.0",
