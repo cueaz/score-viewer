@@ -402,7 +402,3 @@ const main = (): void => {
 };
 
 main();
-
-// TODO: pdf.js: text/annotation layer
-// TODO: RTL Direction/Writing Mode?
-// TODO: Wheel zoom?
