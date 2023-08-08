@@ -14,7 +14,7 @@
     "@types/node": "^20.4.8",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.27",
-    "prettier": "^3.0.0",
+    "prettier": "^3.0.1",
     "typescript": "^5.1.6",
     "vite": "^4.4.7",
     "vite-plugin-minify": "^1.5.2",
