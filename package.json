@@ -22,7 +22,7 @@
     "vite-plugin-static-copy": "^0.17.0"
   },
   "dependencies": {
-    "@unocss/reset": "^0.55.2",
+    "@unocss/reset": "^0.55.3",
     "pdfjs-dist": "^3.9.179",
     "swiper": "^10.2.0"
   }
