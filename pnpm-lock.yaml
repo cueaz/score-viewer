@@ -29,8 +29,8 @@ devDependencies:
     specifier: ^8.4.28
     version: 8.4.28
   prettier:
-    specifier: ^3.0.1
-    version: 3.0.1
+    specifier: ^3.0.2
+    version: 3.0.2
   typescript:
     specifier: ^5.1.6
     version: 5.1.6
@@ -137,7 +137,7 @@ packages:
       '@babel/compat-data': 7.22.9
       '@babel/core': 7.22.9
       '@babel/helper-validator-option': 7.22.5
-      browserslist: 4.21.9
+      browserslist: 4.21.10
       lru-cache: 5.1.1
       semver: 6.3.1
     dev: true
@@ -1813,17 +1813,6 @@ packages:
       update-browserslist-db: 1.0.11(browserslist@4.21.10)
     dev: true
 
-  /browserslist@4.21.9:
-    resolution: {integrity: sha512-M0MFoZzbUrRU4KNfCrDLnvyE7gub+peetoTid3TBIqtunaDJyXlwhakT+/VkvSXcfIzFfK/nkCs4nmyTmxdNSg==}
-    engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
-    hasBin: true
-    dependencies:
-      caniuse-lite: 1.0.30001516
-      electron-to-chromium: 1.4.464
-      node-releases: 2.0.13
-      update-browserslist-db: 1.0.11(browserslist@4.21.9)
-    dev: true
-
   /buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
     dev: true
@@ -1845,10 +1834,6 @@ packages:
     dependencies:
       pascal-case: 3.1.2
       tslib: 2.6.0
-    dev: true
-
-  /caniuse-lite@1.0.30001516:
-    resolution: {integrity: sha512-Wmec9pCBY8CWbmI4HsjBeQLqDTqV91nFVR83DnZpYyRnPI1wePDsTg0bGLPC5VU/3OIZV1fmxEea1b+tFKe86g==}
     dev: true
 
   /caniuse-lite@1.0.30001522:
@@ -1974,7 +1959,7 @@ packages:
   /core-js-compat@3.31.1:
     resolution: {integrity: sha512-wIDWd2s5/5aJSdpOJHfSibxNODxoGoWOBHt8JSPB41NOE94M7kuTPZCYLOlTtuoXTsBPKobpJ6T+y0SSy5L9SA==}
     dependencies:
-      browserslist: 4.21.9
+      browserslist: 4.21.10
     dev: true
 
   /crypto-random-string@2.0.0:
@@ -2041,10 +2026,6 @@ packages:
     hasBin: true
     dependencies:
       jake: 10.8.7
-    dev: true
-
-  /electron-to-chromium@1.4.464:
-    resolution: {integrity: sha512-guZ84yoou4+ILNdj0XEbmGs6DEWj6zpVOWYpY09GU66yEb0DSYvP/biBPzHn0GuW/3RC/pnaYNUWlQE1fJYtgA==}
     dev: true
 
   /electron-to-chromium@1.4.500:
@@ -2960,8 +2941,8 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /prettier@3.0.1:
-    resolution: {integrity: sha512-fcOWSnnpCrovBsmFZIGIy9UqK2FaI7Hqax+DIO0A9UxeVoY4iweyaFjS5TavZN97Hfehph0nhsZnjlVKzEQSrQ==}
+  /prettier@3.0.2:
+    resolution: {integrity: sha512-o2YR9qtniXvwEZlOKbveKfDQVyqxbEIWn48Z8m3ZJjBjcCmUy3xZGIv+7AkaeuaTr6yPXJjwv07ZWlsWbEy1rQ==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
@@ -3509,17 +3490,6 @@ packages:
       browserslist: '>= 4.21.0'
     dependencies:
       browserslist: 4.21.10
-      escalade: 3.1.1
-      picocolors: 1.0.0
-    dev: true
-
-  /update-browserslist-db@1.0.11(browserslist@4.21.9):
-    resolution: {integrity: sha512-dCwEFf0/oT85M1fHBg4F0jtLwJrutGoHSQXCh7u4o2t1drG+c0a9Flnqww6XUKSfQMPpJBRjU8d4RXB09qtvaA==}
-    hasBin: true
-    peerDependencies:
-      browserslist: '>= 4.21.0'
-    dependencies:
-      browserslist: 4.21.9
       escalade: 3.1.1
       picocolors: 1.0.0
     dev: true
