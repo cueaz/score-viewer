@@ -15,7 +15,7 @@
     "autoprefixer": "^10.4.15",
     "postcss": "^8.4.29",
     "prettier": "^3.0.1",
-    "typescript": "^5.1.6",
+    "typescript": "^5.2.2",
     "vite": "^4.4.9",
     "vite-plugin-minify": "^1.5.2",
     "vite-plugin-pwa": "^0.16.4",
