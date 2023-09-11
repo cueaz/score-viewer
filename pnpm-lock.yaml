@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@unocss/reset':
-    specifier: ^0.55.6
-    version: 0.55.6
+    specifier: ^0.55.7
+    version: 0.55.7
   pdfjs-dist:
     specifier: ^3.10.111
     version: 3.10.111
@@ -1609,8 +1609,8 @@ packages:
     resolution: {integrity: sha512-NfQ4gyz38SL8sDNrSixxU2Os1a5xcdFxipAFxYEuLUlvU2uDwS4NUpsImcf1//SlWItCVMMLiylsxbmNMToV/g==}
     dev: true
 
-  /@unocss/reset@0.55.6:
-    resolution: {integrity: sha512-EdeqkYGchGj7dlQ91WVRo75nLW58zWcg9rxppDHvcJXheZVgOllznBFV8SmA5fBtojMj8BEHz71dXe5CLJEDVw==}
+  /@unocss/reset@0.55.7:
+    resolution: {integrity: sha512-yvmLhxqUNgf6wue7IvhV/FdrQW9H9LF1Bmmhwwaiz2aV0E74aN4pbuYPZwNq3YafsQvNQ0UdtuXjddY4QMRCPw==}
     dev: false
 
   /abbrev@1.1.1:
