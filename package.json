@@ -24,6 +24,6 @@
   "dependencies": {
     "@unocss/reset": "^0.55.7",
     "pdfjs-dist": "^3.10.111",
-    "swiper": "^10.2.0"
+    "swiper": "^10.3.0"
   }
 }
