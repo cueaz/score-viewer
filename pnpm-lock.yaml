@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.56.4
     version: 0.56.4
   pdfjs-dist:
-    specifier: ^3.10.111
-    version: 3.10.111
+    specifier: ^3.11.174
+    version: 3.11.174
   swiper:
     specifier: ^10.3.1
     version: 10.3.1
@@ -1595,10 +1595,6 @@ packages:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
     dev: true
 
-  /@types/node@20.6.2:
-    resolution: {integrity: sha512-Y+/1vGBHV/cYk6OI1Na/LHzwnlNCAfU3ZNGrc1LdRe/LAIbdDPTTv/HU3M7yXN448aTVDq3eKRm2cg7iKLb8gw==}
-    dev: true
-
   /@types/node@20.8.0:
     resolution: {integrity: sha512-LzcWltT83s1bthcvjBmiBvGJiiUe84NWRHkw+ZV6Fr41z2FbIzvc815dk2nQ3RAKMuN2fkenM/z3Xv2QzEpYxQ==}
     dev: true
@@ -1606,7 +1602,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 20.6.2
+      '@types/node': 20.8.0
     dev: true
 
   /@types/trusted-types@2.0.3:
@@ -2621,7 +2617,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.6.2
+      '@types/node': 20.8.0
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: true
@@ -2925,8 +2921,8 @@ packages:
     dev: false
     optional: true
 
-  /pdfjs-dist@3.10.111:
-    resolution: {integrity: sha512-+SXXGN/3YTNQSK5Ae7EyqQuR+4IAsNunJq/Us5ByOkRJ45qBXXOwkiWi3RIDU+CyF+ak5eSWXl2FQW2PKBrsRA==}
+  /pdfjs-dist@3.11.174:
+    resolution: {integrity: sha512-TdTZPf1trZ8/UFu5Cx/GXB7GZM30LT+wWUNfsi6Bq8ePLnb+woNKtDymI2mxZYBpMbonNFqKmiz684DIfnd8dA==}
     engines: {node: '>=18'}
     optionalDependencies:
       canvas: 2.11.2
