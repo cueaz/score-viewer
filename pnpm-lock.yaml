@@ -12,8 +12,8 @@ dependencies:
     specifier: ^3.10.111
     version: 3.10.111
   swiper:
-    specifier: ^10.3.0
-    version: 10.3.0
+    specifier: ^10.3.1
+    version: 10.3.1
 
 devDependencies:
   '@types/dom-screen-wake-lock':
@@ -3325,8 +3325,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /swiper@10.3.0:
-    resolution: {integrity: sha512-o81KZH4phL/dJxKFWpZ/zf78QxOyFMood+c86vJJO0ZeSOoniyzV8HWDsw12KOlQdm4WRxrc/6kfGImAcxcS3w==}
+  /swiper@10.3.1:
+    resolution: {integrity: sha512-24Wk3YUdZHxjc9faID97GTu6xnLNia+adMt6qMTZG/HgdSUt4fS0REsGUXJOgpTED0Amh/j+gRGQxsLayJUlBQ==}
     engines: {node: '>= 4.7.0'}
     dev: false
 
