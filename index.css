@@ -8,7 +8,7 @@ body {
 
 .visualizer {
   flex: 0 0 10px;
-  --inactive: #aeaeae;
+  --inactive: #cdcdcd;
   background: var(--inactive);
   position: relative;
   z-index: 1;
