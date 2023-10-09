@@ -248,33 +248,30 @@ const noteColors = [
   '#58c792',
 ]; // total 12
 const inactiveColor = 'var(--inactive)';
+const [noteMin, noteMax] = [21, 108];
 
-const visualizeMIDI = (): void => {
-  if (notesOn.size === 0) {
-    for (const visualizer of visualizers) {
-      visualizer.style.background = inactiveColor;
-    }
-    for (const effect of effects) {
-      effect.style.background = 'transparent';
-    }
-    return;
-  }
-
-  const colors = [...notesOn.keys()]
-    .sort((a, b) => a - b)
-    .map((note) => noteColors[note % noteColors.length]);
+const computeGradient = (inactive: string): string => {
+  const colors = [...Array(noteMax - noteMin + 1).keys()]
+    .map((i) => i + noteMin)
+    .map((note) =>
+      notesOn.has(note) ? noteColors[note % noteColors.length] : inactive,
+    );
   const ratios = [...colors.keys(), colors.length].map(
-    (i) => `${(i / colors.length) * 100}%`,
+    (i) => `calc(100% * ${i} / ${colors.length})`,
   );
   const breaks = colors.map(
     (color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`,
   );
   const gradient = `linear-gradient(to right, ${breaks.join(', ')})`;
+  return gradient;
+};
+
+const visualizeMIDI = (): void => {
   for (const visualizer of visualizers) {
-    visualizer.style.background = gradient;
+    visualizer.style.background = computeGradient(inactiveColor);
   }
   for (const effect of effects) {
-    effect.style.background = gradient;
+    effect.style.background = computeGradient('transparent');
   }
 };
 
@@ -388,17 +385,21 @@ const setupWakeLock = (): void => {
   }
 };
 
+const observeResizing = (): void => {
+  new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      displayPDF(false, entry.contentRect);
+    }
+  }).observe(container);
+};
+
 const main = (): void => {
   setupWakeLock();
   setupFullscreen();
   setupDragAndDrop();
   setupFileInput();
   setupMIDI();
-  new ResizeObserver((entries) => {
-    for (const entry of entries) {
-      displayPDF(false, entry.contentRect);
-    }
-  }).observe(container);
+  observeResizing();
 };
 
 main();
