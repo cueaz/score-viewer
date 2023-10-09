@@ -17,11 +17,11 @@ body {
 
 .effect {
   position: absolute;
-  height: 40px;
+  height: calc(50vh - 10px);
   width: 100%;
   --break-1: rgb(0 0 0 / 0.3);
-  --break-2: rgb(0 0 0 / 0.1) 30%;
-  --break-3: transparent;
+  --break-2: rgb(0 0 0 / 0.1) 30px;
+  /* --break-3: transparent; */
   display: flex;
 }
 
@@ -34,8 +34,7 @@ body {
   mask-image: linear-gradient(
     to bottom,
     var(--break-1),
-    var(--break-2),
-    var(--break-3)
+    var(--break-2) /* var(--break-3) */
   );
 }
 
@@ -44,8 +43,7 @@ body {
   mask-image: linear-gradient(
     to top,
     var(--break-1),
-    var(--break-2),
-    var(--break-3)
+    var(--break-2) /* var(--break-3) */
   );
 }
 
