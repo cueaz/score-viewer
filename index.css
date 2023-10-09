@@ -12,6 +12,7 @@ body {
   background: var(--inactive);
   position: relative;
   z-index: 1;
+  display: flex;
 }
 
 .effect {
@@ -21,6 +22,11 @@ body {
   --break-1: rgb(0 0 0 / 0.3);
   --break-2: rgb(0 0 0 / 0.1) 30%;
   --break-3: transparent;
+  display: flex;
+}
+
+.note {
+  flex: 1 1 auto;
 }
 
 .effect.below {

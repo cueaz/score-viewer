@@ -178,6 +178,24 @@ const displayPDF = async (
   swiper.update();
 };
 
+const [noteMin, noteMax] = [21, 108];
+const noteElements = new Map<number, HTMLElement[]>();
+
+const setupNoteElements = (): void => {
+  for (const nate of [...Array(noteMax - noteMin + 1).keys()].map(
+    (i) => i + noteMin,
+  )) {
+    let elements = [];
+    for (const parent of [...visualizers, ...effects]) {
+      const element = document.createElement('div');
+      element.classList.add('note');
+      parent.append(element);
+      elements.push(element);
+    }
+    noteElements.set(nate, elements);
+  }
+};
+
 type Message = {
   command: number;
   note: number;
@@ -196,12 +214,20 @@ const parseMIDIMessage = (data: Uint8Array): Message => {
   };
 };
 
-const notesOn = new Map<number, number>();
-const mutateNotesOn = <T>(func: () => T): T => {
-  const res = func();
-  visualizeMIDI();
-  return res;
-};
+const noteColors = [
+  '#f38a9c',
+  '#29c0e6',
+  '#e29f49',
+  '#9fa4fe',
+  '#93be63',
+  '#e48dc8',
+  '#07c8c0',
+  '#f3906e',
+  '#6bb4fd',
+  '#c1b043',
+  '#c796eb',
+  '#58c792',
+]; // total 12
 
 const noteOn = 9;
 const noteOff = 8;
@@ -209,12 +235,21 @@ const noteOff = 8;
 const onMIDIMessage = (event: Event): void => {
   const e = event as MIDIMessageEvent;
   const { command, note, velocity } = parseMIDIMessage(e.data);
-  const timestamp = e.timeStamp;
+  // const timestamp = e.timeStamp;
+
+  const elements = noteElements.get(note);
+  if (!elements) {
+    return;
+  }
 
   if (command === noteOff || (command === noteOn && velocity === 0)) {
-    mutateNotesOn(() => notesOn.delete(note));
+    for (const element of elements) {
+      element.style.background = '';
+    }
   } else if (command === noteOn) {
-    mutateNotesOn(() => notesOn.set(note, timestamp));
+    for (const element of elements) {
+      element.style.background = noteColors[note % noteColors.length];
+    }
   }
 };
 
@@ -230,48 +265,6 @@ const setupMIDIDevices = (midi: MIDIAccess): void => {
     // Override onmidimessage
     entry.removeEventListener('midimessage', onMIDIMessage);
     entry.addEventListener('midimessage', onMIDIMessage);
-  }
-};
-
-const noteColors = [
-  '#f38a9c',
-  '#29c0e6',
-  '#e29f49',
-  '#9fa4fe',
-  '#93be63',
-  '#e48dc8',
-  '#07c8c0',
-  '#f3906e',
-  '#6bb4fd',
-  '#c1b043',
-  '#c796eb',
-  '#58c792',
-]; // total 12
-const inactiveColor = 'var(--inactive)';
-const [noteMin, noteMax] = [21, 108];
-
-const computeGradient = (inactive: string): string => {
-  const colors = [...Array(noteMax - noteMin + 1).keys()]
-    .map((i) => i + noteMin)
-    .map((note) =>
-      notesOn.has(note) ? noteColors[note % noteColors.length] : inactive,
-    );
-  const ratios = [...colors.keys(), colors.length].map(
-    (i) => `calc(100% * ${i} / ${colors.length})`,
-  );
-  const breaks = colors.map(
-    (color, i) => `${color} ${ratios[i]} ${ratios[i + 1]}`,
-  );
-  const gradient = `linear-gradient(to right, ${breaks.join(', ')})`;
-  return gradient;
-};
-
-const visualizeMIDI = (): void => {
-  for (const visualizer of visualizers) {
-    visualizer.style.background = computeGradient(inactiveColor);
-  }
-  for (const effect of effects) {
-    effect.style.background = computeGradient('transparent');
   }
 };
 
@@ -394,6 +387,7 @@ const observeResizing = (): void => {
 };
 
 const main = (): void => {
+  setupNoteElements();
   setupWakeLock();
   setupFullscreen();
   setupDragAndDrop();
