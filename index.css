@@ -7,7 +7,8 @@ body {
 }
 
 .visualizer {
-  flex: 0 0 10px;
+  --height: 10px;
+  flex: 0 0 var(--height);
   --inactive: #cdcdcd;
   background: var(--inactive);
   position: relative;
@@ -17,7 +18,7 @@ body {
 
 .effect {
   position: absolute;
-  height: calc(50vh - 10px);
+  height: calc(50vh - var(--height));
   width: 100%;
   --break-1: rgb(0 0 0 / 0.3);
   --break-2: rgb(0 0 0 / 0.1) 30px;

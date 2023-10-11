@@ -182,7 +182,7 @@ const [noteMin, noteMax] = [21, 108];
 const noteElements = new Map<number, HTMLElement[]>();
 
 const setupNoteElements = (): void => {
-  for (const nate of [...Array(noteMax - noteMin + 1).keys()].map(
+  for (const note of [...Array(noteMax - noteMin + 1).keys()].map(
     (i) => i + noteMin,
   )) {
     let elements = [];
@@ -192,7 +192,7 @@ const setupNoteElements = (): void => {
       parent.append(element);
       elements.push(element);
     }
-    noteElements.set(nate, elements);
+    noteElements.set(note, elements);
   }
 };
 
