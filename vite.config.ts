@@ -75,6 +75,7 @@ export default defineConfig({
     ViteMinifyPlugin(),
   ],
   build: {
+    target: 'es2022',
     assetsDir: prefixAssets,
     rollupOptions: {
       output: {

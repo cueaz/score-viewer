@@ -12,7 +12,7 @@ import Swiper from 'swiper';
 import { Pagination, Mousewheel, Keyboard } from 'swiper/modules';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
+  'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
 ).toString();
 
