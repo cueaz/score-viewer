@@ -19,7 +19,7 @@
     "vite": "^4.5.10",
     "vite-plugin-minify": "^1.5.2",
     "vite-plugin-pwa": "^0.16.5",
-    "vite-plugin-static-copy": "^0.17.0"
+    "vite-plugin-static-copy": "^2.3.2"
   },
   "dependencies": {
     "@unocss/reset": "^0.56.5",
