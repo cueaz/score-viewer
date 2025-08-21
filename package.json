@@ -16,7 +16,7 @@
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2",
-    "vite": "^4.5.10",
+    "vite": "^4.5.14",
     "vite-plugin-minify": "^1.5.2",
     "vite-plugin-pwa": "^0.16.5",
     "vite-plugin-static-copy": "^2.3.2"
